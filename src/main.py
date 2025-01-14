@@ -5,17 +5,35 @@ import fastapi
 import requests
 import uvicorn
 
+CONFIG_FILENAME = ".gist_dictionary.json"
+
 
 def init():
     # 交互式填写必要信息和创建config
     # 用户需要的gist需要自己手动创建好，本工具不会也不能为用户代办这个操作，以及这样可以保证在生成github token的时候授予最小权限即只能读写一个gist就可以用
-    pass
+    set_config()
+    get_config()
+    # 逻辑，启动init的时候自动执行一个检测是否有config的检测，然后去获取（这时候一定是有文件的），如果获取到的里面有问题就要求用户填写信息。
+    # 然后整完直接整个覆盖到现有config文件上去
 
 
-def get_config():
-    with open(".gist_dictionary.json", "r", encoding="utf-8") as f:
+def get_config() -> dict:
+    with open(CONFIG_FILENAME, "r", encoding="utf-8") as f:
         config = json.loads(f.read())
-    pass
+
+
+def set_config(config_dict: dict = {}) -> None:
+    DEFAULT_CONFIG = """
+{
+  "GH_TOKEN": "DO NOT CONTAIN THIS",
+  "config": {
+    "gist_name": ""
+  }
+}
+"""
+    if os.path.exists(CONFIG_FILENAME) is False:
+        with open(CONFIG_FILENAME, "w", encoding="utf-8") as f:
+            f.write(DEFAULT_CONFIG)
 
 
 def get_gist_content():
