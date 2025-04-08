@@ -16,19 +16,19 @@ class Entry():
     def __attach_attribute():
         pass
 
-def GH_TOKEN()->dict:
+def init_config()->dict:
     # 交互式填写必要信息和创建config
     # 用户需要的gist需要自己手动创建好
     # 本工具不会也不能为用户代办这个操作
     # 以及这样可以保证在生成github token的时候授予最小权限
     # 即只能读写一个gist就可以用
     set_config()
-    GH_TOKEN=get_config()
+    config=get_config()
     # 逻辑，启动init的时候自动执行一个检测是否有config的检测
     # 然后去获取（这时候一定是有文件的）
     # 如果获取到的里面有问题就要求用户填写信息。
     # 然后整完直接整个覆盖到现有config文件上去
-    return {"GH_TOKEN":GH_TOKEN}
+    return config
 
 
 def get_config() -> dict:
@@ -87,9 +87,11 @@ def authentication(token:str=""):
 
 def main():
     # init_config=init()
-    init_config=GH_TOKEN()
-    if init_config.get("GH_TOKEN",None)!=None:
-        TOKEN=init_config["GH_TOKEN"]
+    config=init_config()
+    # print(config)
+    if config.get("GH_TOKEN",None)!=None:
+        TOKEN=config["GH_TOKEN"]
+        # print(TOKEN)
     authentication(token=TOKEN)
     pass
 
