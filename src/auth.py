@@ -17,8 +17,8 @@ def get_token() -> str:
     try:
         GH_TOKEN = os.environ.get("GH_TOKEN", None)
         GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", None)
-        logger.debug(GH_TOKEN)
-        logger.debug(GITHUB_TOKEN)
+        logger.trace(f"GH_TOKEN = {GH_TOKEN}")
+        logger.trace(f"GITHUB_TOKEN = {GITHUB_TOKEN}")
         if GH_TOKEN != None and GH_TOKEN != "":
             token = GH_TOKEN
         elif GITHUB_TOKEN != None and GITHUB_TOKEN != "":
@@ -40,5 +40,5 @@ def get_token() -> str:
         ) as f:
             token = json.loads(f.read().replace("\n", "")).get("GH_TOKEN", "")
 
-    logger.success(token)
+    logger.success(f"token = {token}")
     return token

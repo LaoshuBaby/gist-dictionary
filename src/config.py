@@ -6,12 +6,14 @@ from log import logger
 
 
 def set_config():
+    """
     # 交互式填写必要信息和创建config
     # 用户需要的gist需要自己手动创建好
     # 本工具不会也不能为用户代办这个操作
     # 以及这样可以保证在生成github token的时候授予最小权限
     # 即只能读写一个gist就可以用
     # 初次运行的时候自动生成config不属于这个函数的功能
+    """
     logger.info("请填写您的")
     pass
 
