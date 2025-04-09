@@ -1,8 +1,9 @@
 import os
+from const import CONFIG_FILENAME, ROOT_PATH
 from log import logger
 
 
-def get_token(token: str = "") -> str:
+def get_token() -> str:
     # 获取gist访问的时候需要一个github的token
 
     # 在读取环境变量名称的时候将优先github官方指定的环境变量名
@@ -15,14 +16,13 @@ def get_token(token: str = "") -> str:
         GH_TOKEN = os.environ.get("GH_TOKEN", None)
         GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", None)
         if GH_TOKEN != None and GH_TOKEN != "":
-            TOKEN = GH_TOKEN
+            token = GH_TOKEN
         elif GITHUB_TOKEN != None and GITHUB_TOKEN != "":
-            TOKEN = GITHUB_TOKEN
-        else:
-            TOKEN = token
+            token = GITHUB_TOKEN
     except Exception as e:
         logger.error(e)
-        TOKEN = token
+    with open(os.path.join(ROOT_PATH, "config", CONFIG_FILENAME),"r",encoding="utf-8") as f:
+        token = f.read().replace("\n","")
 
-    logger.success(TOKEN)
-    return TOKEN
+    logger.success(token)
+    return token

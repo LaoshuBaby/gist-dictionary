@@ -1,4 +1,5 @@
 import os
+import json
 
 from const import ROOT_PATH, ROOT_FOLDERS,ROOT_PROFILES
 from log import logger
@@ -9,19 +10,18 @@ def init_root_path() -> None:
     # root check
     if os.path.exists(ROOT_PATH) != True:
         os.mkdir(ROOT_PATH)
+
     # folder check
     for folder in ROOT_FOLDERS:
         this_folder_path = os.path.join(ROOT_PATH, folder)
         if os.path.exists(this_folder_path) != True:
 
             os.mkdir(this_folder_path)
+
     # profile files check
-
     for profile in ROOT_PROFILES:
-        this_profile_path = os.path.join(ROOT_PROFILES, "config", profile)
+        this_profile_path = os.path.join(ROOT_PATH, "config", profile)
         if os.path.exists(this_profile_path) != True:
-            import json
-
             with open(
                 this_profile_path, "w", encoding="utf-8"
             ) as f_this_profile:
