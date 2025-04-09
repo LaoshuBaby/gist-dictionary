@@ -1,7 +1,7 @@
-import os
 import json
+import os
 
-from const import ROOT_PATH, ROOT_FOLDERS,ROOT_PROFILES
+from const import ROOT_FOLDERS, ROOT_PATH, ROOT_PROFILES
 from log import logger
 
 

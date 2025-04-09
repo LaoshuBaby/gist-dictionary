@@ -1,8 +1,9 @@
 import json
 import os
 
-from const import ROOT_PATH, CONFIG_FILENAME
+from const import CONFIG_FILENAME, ROOT_PATH
 from log import logger
+
 
 def set_config():
     # 交互式填写必要信息和创建config

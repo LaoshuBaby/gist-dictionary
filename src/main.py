@@ -11,7 +11,7 @@ from log import logger
 from storage import init_root_path
 
 
-def init()->dict:
+def init() -> dict:
     """
     在经过init之后，就已经获得了authentication的token了
     """
@@ -25,8 +25,9 @@ def init()->dict:
 
 def main():
     config = init()
-    gist_raw_data = get_gist(auth_token=config["GH_TOKEN"], gist_id="")
+    gist_raw_data = get_gist(auth_token=config["GH_TOKEN"], gist_id=config["config"]["gist_name"])
     logger.info(gist_raw_data)
+
 
 if __name__ == "__main__":
     main()

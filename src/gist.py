@@ -26,11 +26,14 @@ def get_gist(auth_token: str, gist_id: str):
         logger.error(e)
 
     if response.status_code == 200:
-        gist_data = response.json()
-        print(gist_data)
+        gist_metadata = response.json()
+        logger.trace(gist_metadata)
     else:
-        print(f"Failed to retrieve gist: {response.status_code}")
-        print(response.text)
+        logger.error(f"Failed to retrieve gist: {response.status_code}")
+        logger.warning(response.text)
+
+    gist_data=gist_metadata.get("files").get("wordbank.json").get("content")
+    return gist_data
 
 
 def put_gist():

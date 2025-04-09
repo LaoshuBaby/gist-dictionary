@@ -1,4 +1,6 @@
+import json
 import os
+
 from const import CONFIG_FILENAME, ROOT_PATH
 from log import logger
 
@@ -15,14 +17,28 @@ def get_token() -> str:
     try:
         GH_TOKEN = os.environ.get("GH_TOKEN", None)
         GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", None)
+        logger.debug(GH_TOKEN)
+        logger.debug(GITHUB_TOKEN)
         if GH_TOKEN != None and GH_TOKEN != "":
             token = GH_TOKEN
         elif GITHUB_TOKEN != None and GITHUB_TOKEN != "":
             token = GITHUB_TOKEN
+        else:
+            with open(
+                os.path.join(ROOT_PATH, "config", CONFIG_FILENAME),
+                "r",
+                encoding="utf-8",
+            ) as f:
+                token = json.loads(f.read().replace("\n", "")).get("GH_TOKEN", "")
+
     except Exception as e:
         logger.error(e)
-    with open(os.path.join(ROOT_PATH, "config", CONFIG_FILENAME),"r",encoding="utf-8") as f:
-        token = f.read().replace("\n","")
+        with open(
+            os.path.join(ROOT_PATH, "config", CONFIG_FILENAME),
+            "r",
+            encoding="utf-8",
+        ) as f:
+            token = json.loads(f.read().replace("\n", "")).get("GH_TOKEN", "")
 
     logger.success(token)
     return token
