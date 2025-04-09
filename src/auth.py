@@ -1,4 +1,5 @@
 import os
+from log import logger
 
 
 def get_token(token: str = "") -> str:
@@ -20,8 +21,8 @@ def get_token(token: str = "") -> str:
         else:
             TOKEN = token
     except Exception as e:
-        print(e)
+        logger.error(e)
         TOKEN = token
 
-    print(TOKEN)
+    logger.success(TOKEN)
     return TOKEN

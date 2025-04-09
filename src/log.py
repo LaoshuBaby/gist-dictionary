@@ -1,7 +1,10 @@
+import os
 from hellologger import get_logger
 
+from const import ROOT_PATH
+
 logger = get_logger(
-    log_path=os.path.join(get_root_path(), "log"),
+    log_path=os.path.join(ROOT_PATH, "log"),
     log_file="log_{time}.log",
     log_target={
         "local": True,
