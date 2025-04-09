@@ -8,30 +8,30 @@ import uvicorn
 import hellologger
 
 from hellologger import get_logger
+ROOT_PATH = os.path.join(os.environ["USERPROFILE"], ".gist_dictionary")
 
 
-def get_root_path() -> str:
-    ROOT_PATH = os.path.join(os.environ["USERPROFILE"], ".gist_dictionary")
+ROOT_FOLDERS = ["log","config"]
+ROOT_PROFILES=[".gist_dictionary.json"]
 
-    folders = ["log","config"]
-    profiles=[".gist_dictionary.json"]
-
-    def init_root_path() -> None:
+def init_root_path() -> None:
         
 
         # root check
-        if os.path.exists(ROOT_PATH) != True:
+    if os.path.exists(ROOT_PATH) != True:
             os.mkdir(ROOT_PATH)
         # folder check
-        for folder in folders:
+    for folder in ROOT_FOLDERS:
             this_folder_path = os.path.join(ROOT_PATH, folder)
             if os.path.exists(this_folder_path) != True:
 
                 os.mkdir(this_folder_path)
         # profile files check
-        for profile in profiles:
+
+    def set_config():
+        for profile in ROOT_PROFILES:
             this_profile_path = os.path.join(
-                profiles, "config", profile
+                ROOT_PROFILES, "config", profile
             )
             if os.path.exists(this_profile_path) != True:
                 import json
@@ -41,14 +41,16 @@ def get_root_path() -> str:
                     f_this_profile.write(
                         json.dumps(
                             {
-  "GH_TOKEN": "DO NOT CONTAIN THIS",
-  "config": {
-    "gist_name": ""
-  }                            }
-                        )
-                    )
+        "GH_TOKEN": "DO NOT CONTAIN THIS",
+        "config": {
+            "gist_name": ""
+        }                            },ensure_ascii=False,indent=2,sort_keys=False
+                                )
+                            )
 
 
+
+def get_root_path() -> str:
     init_root_path()
     return ROOT_PATH
 
@@ -69,29 +71,6 @@ logger = get_logger(
     **{"foo":"bar"},
 )
 
-def get_gist(auth_token:str,gist_id:str):
-    import requests
-
-    # Define the URL for the GitHub API request
-    url = f'https://api.github.com/gists/{gist_id}'
-
-    # Set up the headers, including the authorization token and the API version
-    headers = {
-        'Authorization': f'token {auth_token}',
-        'X-GitHub-Api-Version': '2022-11-28'
-    }
-
-    # Make the GET request to the GitHub API
-    response = requests.get(url, headers=headers)
-
-    # Check if the request was successful
-    if response.status_code == 200:
-        # Parse the JSON response
-        gist_data = response.json()
-        print(gist_data)
-    else:
-        print(f'Failed to retrieve gist: {response.status_code}')
-        print(response.text)
 
 CONFIG_FILENAME = ".gist_dictionary.json"
 
@@ -125,37 +104,10 @@ def get_config() -> dict:
     return {}
 
 
-def get_gist_content():
-    # 需要获取的gist名字需要提前放在配置文件里面，建议写一个init过程
-    # 这块的读取文档在 https://docs.github.com/en/rest/gists/gists?apiVersion=2022-11-28#get-a-gist
-
-    pass
 
 
-def put_gist_content():
-    pass
 
 
-def authentication(token:str=""):
-
-    # 获取gist访问的时候需要一个github的token，这个可以从系统环境变量去获得，并且不推荐明文存储在任何文件中因为这个太危险了。
-    # 其实系统环境变量也是非常危险的
-    # 还是优先看有没有github官方指定的环境变量名，有，https://cli.github.com/manual/gh_help_environment
-    try:
-        GH_TOKEN=os.environ.get("GH_TOKEN",None)
-        GITHUB_TOKEN =os.environ.get("GITHUB_TOKEN",None)
-        if GH_TOKEN!=None and GH_TOKEN!="":
-            TOKEN=GH_TOKEN
-        elif GITHUB_TOKEN!=None and GITHUB_TOKEN!="":
-            TOKEN=GITHUB_TOKEN
-        else:
-            TOKEN=token
-    except Exception as e:
-        print(e)
-        TOKEN=token
-
-    print(TOKEN)
-    pass
 
 
 def main():
