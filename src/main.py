@@ -10,57 +10,30 @@ import hellologger
 from hellologger import get_logger
 
 
-def get_yuheng_path() -> str:
-    YUHENG_PATH = os.path.join(os.environ["USERPROFILE"], ".yuheng")
+def get_root_path() -> str:
+    ROOT_PATH = os.path.join(os.environ["USERPROFILE"], ".yuheng")
 
-    def init_yuheng_path() -> None:
-        YUHENG_FOLDER = ["cache", "db_profiles", "log"]
-        YUHENG_PROFILES = [
-            "mysql.db_profiles.yuheng",
-            "postgresql.db_profiles.yuheng",
-        ]
+    def init_root_path() -> None:
+        folders = ["log"]
+
         # root check
-        if os.path.exists(YUHENG_PATH) != True:
-            print("[YUHENG ENVIRON INIT]", YUHENG_PATH, "isn't exist!")
-            os.mkdir(YUHENG_PATH)
+        if os.path.exists(ROOT_PATH) != True:
+            os.mkdir(ROOT_PATH)
         # folder check
-        for folder in YUHENG_FOLDER:
-            this_folder_path = os.path.join(YUHENG_PATH, folder)
+        for folder in folders:
+            this_folder_path = os.path.join(ROOT_PATH, folder)
             if os.path.exists(this_folder_path) != True:
-                print(
-                    "[YUHENG ENVIRON INIT]", this_folder_path, "isn't exist!"
-                )
+
                 os.mkdir(this_folder_path)
-        # profile files check
-        for profile in YUHENG_PROFILES:
-            this_profile_path = os.path.join(
-                YUHENG_PATH, "db_profiles", profile
-            )
-            if os.path.exists(this_profile_path) != True:
-                import json
 
-                print(
-                    "[YUHENG ENVIRON INIT]", this_profile_path, "isn't exist!"
-                )
-                with open(
-                    this_profile_path, "w", encoding="utf-8"
-                ) as f_this_profile:
-                    f_this_profile.write(
-                        json.dumps(
-                            {
-                                "yuheng_doctype": "db_profile",
-                                "_WARNING": "PLEASE DELETE THIS LINE AND FILL IT ACCORDING TO DOCS.",
-                            }
-                        )
-                    )
 
-    init_yuheng_path()
-    return YUHENG_PATH
+    init_root_path()
+    return ROOT_PATH
 
 
 
 logger = get_logger(
-    log_path=os.path.join(get_yuheng_path(), "log"),
+    log_path=os.path.join(get_root_path(), "log"),
     log_file="log_{time}.log",
     log_target={
         "local": True,
@@ -71,8 +44,37 @@ logger = get_logger(
         "local": "TRACE",
         "aliyun": "INFO",
     },
-    **{**log_config_local, **log_config_aliyun},
+    **{"foo":"bar"},
 )
+
+def get_gist():
+    import requests
+
+    # Replace 'YOUR-TOKEN' with your actual GitHub token
+    auth_token = 'YOUR-TOKEN'
+    # Replace 'GIST_ID' with the actual ID of the gist you want to retrieve
+    gist_id = 'GIST_ID'
+
+    # Define the URL for the GitHub API request
+    url = f'https://api.github.com/gists/{gist_id}'
+
+    # Set up the headers, including the authorization token and the API version
+    headers = {
+        'Authorization': f'token {auth_token}',
+        'X-GitHub-Api-Version': '2022-11-28'
+    }
+
+    # Make the GET request to the GitHub API
+    response = requests.get(url, headers=headers)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Parse the JSON response
+        gist_data = response.json()
+        print(gist_data)
+    else:
+        print(f'Failed to retrieve gist: {response.status_code}')
+        print(response.text)
 
 CONFIG_FILENAME = ".gist_dictionary.json"
 
