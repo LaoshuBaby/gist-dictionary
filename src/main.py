@@ -11,10 +11,13 @@ from hellologger import get_logger
 
 
 def get_root_path() -> str:
-    ROOT_PATH = os.path.join(os.environ["USERPROFILE"], ".yuheng")
+    ROOT_PATH = os.path.join(os.environ["USERPROFILE"], ".gist_dictionary")
+
+    folders = ["log","config"]
+    profiles=[".gist_dictionary.json"]
 
     def init_root_path() -> None:
-        folders = ["log"]
+        
 
         # root check
         if os.path.exists(ROOT_PATH) != True:
@@ -25,6 +28,25 @@ def get_root_path() -> str:
             if os.path.exists(this_folder_path) != True:
 
                 os.mkdir(this_folder_path)
+        # profile files check
+        for profile in profiles:
+            this_profile_path = os.path.join(
+                profiles, "config", profile
+            )
+            if os.path.exists(this_profile_path) != True:
+                import json
+                with open(
+                    this_profile_path, "w", encoding="utf-8"
+                ) as f_this_profile:
+                    f_this_profile.write(
+                        json.dumps(
+                            {
+  "GH_TOKEN": "DO NOT CONTAIN THIS",
+  "config": {
+    "gist_name": ""
+  }                            }
+                        )
+                    )
 
 
     init_root_path()
@@ -47,13 +69,8 @@ logger = get_logger(
     **{"foo":"bar"},
 )
 
-def get_gist():
+def get_gist(auth_token:str,gist_id:str):
     import requests
-
-    # Replace 'YOUR-TOKEN' with your actual GitHub token
-    auth_token = 'YOUR-TOKEN'
-    # Replace 'GIST_ID' with the actual ID of the gist you want to retrieve
-    gist_id = 'GIST_ID'
 
     # Define the URL for the GitHub API request
     url = f'https://api.github.com/gists/{gist_id}'
@@ -93,7 +110,6 @@ def init_config()->dict:
     # 本工具不会也不能为用户代办这个操作
     # 以及这样可以保证在生成github token的时候授予最小权限
     # 即只能读写一个gist就可以用
-    set_config()
     config=get_config()
     # 逻辑，启动init的时候自动执行一个检测是否有config的检测
     # 然后去获取（这时候一定是有文件的）
@@ -107,20 +123,6 @@ def get_config() -> dict:
         config = json.loads(f.read())
         return config
     return {}
-
-
-def set_config(config_dict: dict = {}) -> None:
-    DEFAULT_CONFIG = """
-{
-  "GH_TOKEN": "DO NOT CONTAIN THIS",
-  "config": {
-    "gist_name": ""
-  }
-}
-"""
-    if os.path.exists(CONFIG_FILENAME) is False:
-        with open(CONFIG_FILENAME, "w", encoding="utf-8") as f:
-            f.write(DEFAULT_CONFIG)
 
 
 def get_gist_content():
@@ -158,12 +160,17 @@ def authentication(token:str=""):
 
 def main():
     # init_config=init()
+    logger.info("HelloWOrld")
     config=init_config()
     # print(config)
     if config.get("GH_TOKEN",None)!=None:
         TOKEN=config["GH_TOKEN"]
         # print(TOKEN)
+    else:
+        print("NOWAY")
+        exit(0)
     authentication(token=TOKEN)
+    # get_gist(auth_token=TOKEN,gist_id="")
     pass
 
 
