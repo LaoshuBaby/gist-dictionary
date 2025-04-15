@@ -1,44 +1,48 @@
 # DOCUMENT / 文档 / ドキュメント
 
-note that server will not storage all version of a entry ( I guess)
+## Overview
 
-but will write to log when a entry was changed or created, and log will contain every thing for a entry (use its method to get one-line output)
+The server does not store all versions of an entry. However, it writes to a log whenever an entry is created or modified. The log contains all information about an entry and can generate one-line outputs using its method. 
 
-(also can call a webhook if needed)
+Additionally, a webhook can be triggered if needed. To build a history tree, you can rely on the full log or use the webhook.
 
-so if you want to build a history tree, you can use full log or webhook.
+---
 
 ## SERVER API
 
-* GET `/entry/["all"|condition]`
+### Endpoints
 
-* GET `/entry/[id]`
+#### `GET /entry/["all"|condition]`
+- Retrieve entries matching the specified condition or all entries if `"all"` is used.
 
-* PUT `/entry/create`
+#### `GET /entry/[id]`
+- Retrieve the details of a specific entry by its ID.
 
-will return 200 if create successful, or will return 403 if already created or 402 if created failed or 401 if server refused with unknown reason.
+#### `PUT /entry/create`
+- Create a new entry.
+- **Responses**:
+  - `200`: Entry created successfully.
+  - `403`: Entry already exists.
+  - `402`: Entry creation failed.
+  - `401`: Server refused for an unknown reason.
+  - `***`: Invalid JSON format in the request.
 
-will get *** if your request don't match valid json format.
+#### `POST /entry/update/[id]`
+- Update an existing entry by its ID. Updates must include a version. The version must match the latest version + 1, or the server will reject the request.
+- **Responses**:
+  - `200`: Update successful.
+  - `404`: Entry not found on the server.
+  - `403`: Server refused to update due to an unknown version.
+  - `405`: Attempt to update a historical version.
+  - `407`: Attempt to update a future version.
+  - `***`: Invalid JSON format in the request.
+- **Optional Parameter**:
+  - If `--future` is set to `True`, warnings are ignored, and blank versions can be created to bridge the gap between the server and the specified version.
 
-* POST `/entry/update/[id]`
+#### `DELETE /entry/update/[id]`
+- Delete an entry by its ID. Must include the latest version in the request.
 
-this must update with version, if version don't match latest version+1, server will refuse to update because you are trying to change a already created version or future version.
+---
 
-will get 200 if update successful.
-
-will get 404 if try to update a entry not found on server 
-
-will get 403 if server refused to update for unknown version
-
-will get 405 if you are trying to update history version
-
-will get 407 if you are trying to update future version.
-
-But, if with --future as True it will ignore warning and you also can set several blank version for version between server and you given.
-
-will get *** if your request is not valid json format.
-
-* DELETE `/entry/update/[id]`
-
-must give a latest version if you want to delete a 
-
+## Notes
+- The log and webhook mechanism allows tracking changes and reconstructing version history.

@@ -1,9 +1,22 @@
 from typing import Dict, List
 
+from fastapi import FastAPI
+
 from entry import Entry
 
+app = FastAPI()
 
-def get_entry_batch(
+
+@app.get("")
+async def server():
+    """
+    async function be runned by uvicorn
+    """
+    pass
+
+
+@app.get("")
+async def get_entry_batch(
     entry_obj_list: List[Entry], condiation: str = ""
 ) -> Dict[str, List[str]]:
     """ """
@@ -12,20 +25,24 @@ def get_entry_batch(
     return {"words": word_list}
 
 
-def get_entry():
+@app.get("")
+async def get_entry():
     """
     select specific entry with specific id and only can get this one
     """
     pass
 
 
-def create_entry():
+@app.get("")
+async def create_entry():
     pass
 
 
-def update_word():
+@app.get("")
+async def update_word():
     pass
 
 
-def delete_word():
+@app.get("")
+async def delete_word():
     pass

@@ -1,7 +1,6 @@
 import json
 import os
 
-import fastapi
 import uvicorn
 
 from auth import get_token
@@ -29,13 +28,6 @@ def init() -> dict:
     return config
 
 
-def server():
-    """
-    async function be runned by uvicorn
-    """
-    pass
-
-
 def main():
     """
     default word storage is a global list for Entry's obj
@@ -53,8 +45,7 @@ def main():
         logger.info(temp._get())
         ENTRY_WORLD.add(temp)
 
-
-    uvicorn.run()
+    uvicorn.run(app=app)
 
 
 if __name__ == "__main__":
