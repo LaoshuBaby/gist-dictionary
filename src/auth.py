@@ -29,7 +29,9 @@ def get_token() -> str:
                 "r",
                 encoding="utf-8",
             ) as f:
-                token = json.loads(f.read().replace("\n", "")).get("GH_TOKEN", "")
+                token = json.loads(f.read().replace("\n", "")).get(
+                    "GH_TOKEN", ""
+                )
 
     except Exception as e:
         logger.error(e)

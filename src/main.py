@@ -11,6 +11,8 @@ from gist import get_gist
 from log import logger
 from storage import init_root_path
 
+ENTRY_WORLD=set()
+
 
 def init() -> dict:
     """
@@ -25,14 +27,21 @@ def init() -> dict:
 
 
 def main():
+    """
+    default word storage is a global list for Entry's obj
+    while you can get plain text list with server api
+    """
     config = init()
-    gist_raw_data = get_gist(auth_token=config["GH_TOKEN"], gist_id=config["config"]["gist_name"])
+    gist_raw_data = get_gist(
+        auth_token=config["GH_TOKEN"], gist_id=config["config"]["gist_name"]
+    )
     logger.info(f"gist_raw_data: \n{gist_raw_data}")
     logger.trace(type(gist_raw_data))
-    gist_data=json.loads(gist_raw_data)
+    gist_data = json.loads(gist_raw_data)
     for word in gist_data.get("wordbank"):
-        temp=Entry(word["word"])
+        temp = Entry(word["word"])
         logger.info(temp._get())
+        ENTRY_WORLD.add(temp)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 class Entry:
-    def __init__(self,word:str):
+    def __init__(self, word: str):
         self.attribute = {"type": "entry"}
-        self.word=word
+        self.word = word
         pass
 
     def __attach_attribute(self):

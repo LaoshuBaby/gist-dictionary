@@ -10,12 +10,12 @@ from log import logger
 # 需要获取的gist名字推荐提前放在配置文件里面，建议写一个init过程
 # 这块的读取文档在 https://docs.github.com/en/rest/gists/gists?apiVersion=2022-11-28#get-a-gist
 
-IMPLEMENT="local"
+IMPLEMENT = "local"
 
 # Optional value:
-# "local": 
+# "local":
 # * impl made by me
-# "witherredaway": 
+# "witherredaway":
 # * PyPi-[github-gists](https://pypi.org/project/github-gists/)
 # * GitHub-[WitherredAway/gists.py](https://github.com/WitherredAway/gists.py)
 
@@ -42,12 +42,16 @@ def get_gist(auth_token: str, gist_id: str):
             logger.error(f"Failed to retrieve gist: {response.status_code}")
             logger.warning(response.text)
 
-        gist_data=gist_metadata.get("files").get("wordbank.json").get("content")
+        gist_data = (
+            gist_metadata.get("files").get("wordbank.json").get("content")
+        )
     elif IMPLEMENT == "witherredaway":
         import asyncio
+
         import gists
 
         client = gists.Client()
+
         async def main_get():
             # Getting a gist does not require authorization
 
