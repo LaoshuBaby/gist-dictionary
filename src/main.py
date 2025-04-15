@@ -16,7 +16,10 @@ ENTRY_WORLD=set()
 
 def init() -> dict:
     """
-    在经过init之后，就已经获得了authentication的token了
+    will get config as return
+    If can't get token from system path, auth module will use config inlined token value.
+
+    Note that this is unsafe and dangerous.
     """
     logger.success("Hello World!")
     init_root_path()

@@ -4,8 +4,11 @@ class Entry:
         self.word = word
         pass
 
-    def __attach_attribute(self):
+    def _attach_attribute(self):
         pass
 
     def _get(self):
         return self.word
+    
+    def _logline(self)->dict:
+        return "everything in a one line json"
