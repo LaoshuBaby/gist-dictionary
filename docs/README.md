@@ -1,5 +1,4 @@
-# DOCUMENT / 文档 / *
-
+# DOCUMENT / 文档 / ドキュメント
 
 note that server will not storage all version of a entry ( I guess)
 

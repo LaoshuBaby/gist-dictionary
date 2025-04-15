@@ -11,7 +11,7 @@ from gist import get_gist
 from log import logger
 from storage import init_root_path
 
-ENTRY_WORLD=set()
+ENTRY_WORLD = set()
 
 
 def init() -> dict:
@@ -27,6 +27,13 @@ def init() -> dict:
     config["GH_TOKEN"] = get_token()
     logger.debug(f"config: \n{config}")
     return config
+
+
+def server():
+    """
+    async function be runned by uvicorn
+    """
+    pass
 
 
 def main():
@@ -45,6 +52,9 @@ def main():
         temp = Entry(word["word"])
         logger.info(temp._get())
         ENTRY_WORLD.add(temp)
+
+
+    uvicorn.run()
 
 
 if __name__ == "__main__":
