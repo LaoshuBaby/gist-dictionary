@@ -13,7 +13,7 @@ Additionally, a webhook can be triggered if needed. To build a history tree, you
 ### Endpoints
 
 #### `GET /entry/["all"|condition]`
-- Retrieve entries matching the specified condition or all entries if `"all"` is used.
+- Retrieve entries matching the specified condition, or all entries if `"all"` is used.
 
 #### `GET /entry/[id]`
 - Retrieve the details of a specific entry by its ID.
@@ -22,9 +22,9 @@ Additionally, a webhook can be triggered if needed. To build a history tree, you
 - Create a new entry.
 - **Responses**:
   - `200`: Entry created successfully.
-  - `403`: Entry already exists.
-  - `402`: Entry creation failed.
-  - `401`: Server refused for an unknown reason.
+  - `409`: Entry already exists.
+  - `401`: Entry creation failed (no permission or locked).
+  - `400`: Server refused for an unknown reason.
   - `***`: Invalid JSON format in the request.
 
 #### `POST /entry/update/[id]`
@@ -32,16 +32,18 @@ Additionally, a webhook can be triggered if needed. To build a history tree, you
 - **Responses**:
   - `200`: Update successful.
   - `404`: Entry not found on the server.
-  - `403`: Server refused to update due to an unknown version.
-  - `405`: Attempt to update a historical version.
-  - `407`: Attempt to update a future version.
+  - `409`: Server refused to update due to an unknown version.
+  - `403`: Attempt to update a historical version.
+  - `417`: Attempt to update a future version.
   - `***`: Invalid JSON format in the request.
 - **Optional Parameter**:
   - If `--future` is set to `True`, warnings are ignored, and blank versions can be created to bridge the gap between the server and the specified version.
 
 #### `DELETE /entry/update/[id]`
 - Delete an entry by its ID. Must include the latest version in the request.
-
+  - `404`: Entry not found on the server.
+  - `401`: Entry creation failed (no permission or locked).
+  - `400`: Server refused for an unknown reason.
 ---
 
 ## Notes
