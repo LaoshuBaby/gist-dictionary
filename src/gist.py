@@ -72,7 +72,12 @@ def get_gist(auth_token: str, gist_id: str) -> Optional[str]:
     return gist_data
 
 
-def update_gist(auth_token: str, gist_id: str, gist_data: str,file_name:str="wordbank.json"):
+def update_gist(
+    auth_token: str,
+    gist_id: str,
+    gist_data: str,
+    file_name: str = "wordbank.json",
+):
     """
     Official API: https://docs.github.com/en/rest/gists/gists?apiVersion=2022-11-28#update-a-gist
     """
@@ -88,13 +93,26 @@ def update_gist(auth_token: str, gist_id: str, gist_data: str,file_name:str="wor
 
         logger.trace(gist_data)
 
-        gist_data_payload=json.loads('{"files":{"__FILE_NAME__":{"content":"__GIST_DATA__"}}}'.replace("__FILE_NAME__",file_name)
+        gist_data_payload = json.loads(
+            '{"files":{"__FILE_NAME__":{"content":"__GIST_DATA__"}}}'.replace(
+                "__FILE_NAME__", file_name
+            )
         )
-        gist_data_payload["files"][file_name]["content"]=gist_data
+        gist_data_payload["files"][file_name]["content"] = gist_data
         logger.trace(gist_data_payload)
 
         try:
-            response = requests.patch(url, headers=headers,data=json.dumps(gist_data_payload,ensure_ascii=False,indent=0,sort_keys=False))
+            response = requests.patch(
+                url,
+                
+                headers=headers,
+                data=json.dumps(
+                    gist_data_payload,
+                    ensure_ascii=False,
+                    indent=0,
+                    sort_keys=False,
+                ),
+            )
         except Exception as e:
             logger.error(e)
 
