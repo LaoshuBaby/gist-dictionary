@@ -6,7 +6,7 @@ import uvicorn
 from auth import get_token
 from config import init_config
 from entry import Entry
-from gist import get_gist
+from gist import get_gist, update_gist
 from log import logger
 from storage import init_root_path
 
@@ -44,8 +44,9 @@ def main():
         temp = Entry(word["word"])
         logger.info(temp._get())
         ENTRY_WORLD.add(temp)
+    update_gist(auth_token=config["GH_TOKEN"], gist_id=config["config"]["gist_name"],gist_data=gist_raw_data+gist_raw_data)
 
-    uvicorn.run(app=app)
+    # uvicorn.run(app=app)
 
 
 if __name__ == "__main__":
