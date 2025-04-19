@@ -44,7 +44,11 @@ def main():
         temp = Entry(word["word"])
         logger.info(temp._get())
         ENTRY_WORLD.add(temp)
-    update_gist(auth_token=config["GH_TOKEN"], gist_id=config["config"]["gist_name"],gist_data=gist_raw_data+gist_raw_data)
+    update_gist(
+        auth_token=config["GH_TOKEN"],
+        gist_id=config["config"]["gist_name"],
+        gist_data=gist_raw_data + gist_raw_data,
+    )
 
     # uvicorn.run(app=app)
 

@@ -1,4 +1,5 @@
 from typing import Optional
+
 import requests
 
 from log import logger
@@ -21,7 +22,7 @@ IMPLEMENT = "local"
 # * GitHub-[WitherredAway/gists.py](https://github.com/WitherredAway/gists.py)
 
 
-def get_gist(auth_token: str, gist_id: str)->Optional[str]:
+def get_gist(auth_token: str, gist_id: str) -> Optional[str]:
     """
     Official API: https://docs.github.com/en/rest/gists/gists?apiVersion=2022-11-28#get-a-gist
     """
@@ -30,7 +31,7 @@ def get_gist(auth_token: str, gist_id: str)->Optional[str]:
         url = f"https://api.github.com/gists/{gist_id}"
 
         headers = {
-            "Accept":"application/vnd.github+jso",
+            "Accept": "application/vnd.github+jso",
             "Authorization": f"Bearer {auth_token}",
             "X-GitHub-Api-Version": "2022-11-28",
         }
@@ -70,7 +71,7 @@ def get_gist(auth_token: str, gist_id: str)->Optional[str]:
     return gist_data
 
 
-def update_gist(auth_token:str, gist_data:str):
+def update_gist(auth_token: str, gist_id: str, gist_data: str,file_name:str="wordbank.json"):
     """
     Official API: https://docs.github.com/en/rest/gists/gists?apiVersion=2022-11-28#update-a-gist
     """
@@ -79,13 +80,17 @@ def update_gist(auth_token:str, gist_data:str):
         url = f"https://api.github.com/gists/{gist_id}"
 
         headers = {
-            "Accept":"application/vnd.github+jso",
+            "Accept": "application/vnd.github+jso",
             "Authorization": f"Bearer {auth_token}",
             "X-GitHub-Api-Version": "2022-11-28",
         }
 
+        gist_data="""
+{"files":{"********":{"content":"Hello World from GitHub"}}}
+""".replace("********",file_name)
+
         try:
-            response = requests.patch(url, headers=headers)
+            response = requests.patch(url, headers=headers,data=gist_data)
         except Exception as e:
             logger.error(e)
 
@@ -94,7 +99,6 @@ def update_gist(auth_token:str, gist_data:str):
         else:
             logger.error(f"Failed to update gist: {response.status_code}")
             logger.warning(response.text)
-
 
         return response.status_code
     else:
