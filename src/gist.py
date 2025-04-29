@@ -1,3 +1,6 @@
+# 文件说明: GitHub Gist API 包装器 / File Description: Gist API helper for get and update operations
+# 文件说明: GitHub Gist API 包装器 / File Description: Gist API helper for get and update operations
+
 import json
 from typing import Optional
 
