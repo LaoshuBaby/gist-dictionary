@@ -1,91 +1,27 @@
-# RESTful API Implementation
+# gist-dictionary
 
-This project implements a RESTful API service based on the API design documentation in `/docs/api_design.md`.
+使用GitHub Gist存储多来源数据的词典 | Multi-source dictionary that using GitHub Gist for storage | GitHub Gist でストレージの辞書
 
-## Features
+## 代码结构
 
-- User management (CRUD operations)
-- Product management (CRUD operations)
-- Authentication using API keys
-- Error handling with appropriate status codes
-- Pagination for list endpoints
+一个FastAPI的后端用于接受和完成请求
 
-## API Documentation
+提供一个CLI的命令行客户端进行词典查询和添加，同时做一个网页版的方便自己在手机上直接输入网址打开就访问
 
-The API is documented using OpenAPI and can be accessed at `/docs` when the server is running.
+这算是两个前端。考虑到现在用的手机太慢，打开浏览器需要时间，也考虑如果有能力用AI写一个PWA应用或者原生安卓的前端
 
-## Endpoints
+## 干嘛用
 
-### Base URL
+高中的时候背英语词是用的百词斩，后来曾经用沪江小D背过一段日语，当时还是五十音水平。这两个是不能在浏览器或者网上看的，只有软件内。
 
-`/api/v1`
+后来学的深入了就改为目前用的mojidict、然后现在查更多词和日语解释就用weblio。
 
-### Users
+但是weblio的单词帐同步功能是要钱的付费的，而且仅限日英，日语词汇是没有的，只有一个固定链接。但是我仅靠浏览器收藏夹去点开查看还是太费力了，我还是希望能聚合一个能管理和同步我记了的所有单词的东西。
 
-- `GET /api/v1/users` - Get all users
-- `GET /api/v1/users/{id}` - Get a specific user
-- `POST /api/v1/users` - Create a new user
-- `PUT /api/v1/users/{id}` - Update a user
-- `DELETE /api/v1/users/{id}` - Delete a user
+我猜有人又要推荐anki，但我并不需要记住它的所有内容，我需要的是一个简单的单词名称和一句话的释义，以及一个引导我到某个在线辞书（moji也好、weblio也好）的超链接让我点开就进去看这个词典内的详细解释。以及我可能会同时管理韩语和英语的单词（因为我也有在学）
 
-### Products
+那么我觉得与其在anki基础上搞一个同步插件（因为如果要实现自己可以在外部查看的功能，估计还是得开发一个同步服务的后端来接受和处理），不如直接造一个完事了。
 
-- `GET /api/v1/products` - Get all products
-- `GET /api/v1/products/{id}` - Get a specific product
-- `POST /api/v1/products` - Create a new product
-- `PUT /api/v1/products/{id}` - Update a product
-- `DELETE /api/v1/products/{id}` - Delete a product
+毕竟我用Anki还是更少以及我希望能追踪我单词表的变化和扩充情况，那么有历史记录的git做diff的话是更好处理的，而且真实可信。
 
-## Authentication
-
-All endpoints require authentication using an API key in the Authorization header:
-
-```
-Authorization: Bearer <api_key>
-```
-
-## Status Codes
-
-The API uses standard HTTP status codes to indicate the success or failure of requests:
-
-- 200 OK - The request was successful
-- 201 Created - A new resource was successfully created
-- 204 No Content - The request was successful but there is no representation to return
-- 400 Bad Request - The request could not be understood or was missing required parameters
-- 401 Unauthorized - Authentication failed or user does not have permissions
-- 403 Forbidden - Access denied
-- 404 Not Found - Resource not found
-- 409 Conflict - Request could not be completed due to a conflict
-- 422 Unprocessable Entity - The request was well-formed but was unable to be followed due to semantic errors
-- 429 Too Many Requests - Rate limit exceeded
-- 500 Internal Server Error - An unexpected error occurred on the server
-- 503 Service Unavailable - The server is currently unavailable
-
-## How to Run
-
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. Run the server:
-   ```bash
-   python src/main.py
-   ```
-
-3. Access the API at http://localhost:12000
-
-## Development
-
-This project uses FastAPI for the API implementation. The code is organized as follows:
-
-- `src/main.py` - Entry point for the application
-- `src/server.py` - FastAPI application setup
-- `src/db.py` - In-memory database implementation
-- `src/models/` - Pydantic models for request/response validation
-- `src/routes/` - API route handlers
-- `src/middleware/` - Middleware components (authentication, etc.)
-
-## License
-
-MIT
+那么就酱，我的坑挖好了，欢迎好心人帮我来填（不这个肯定是要自己填的）
