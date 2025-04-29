@@ -1,4 +1,10 @@
+# 文件说明: 提取 Gist 访问 Token / File Description: Retrieves GitHub Gist access token from environment or config
+# 文件说明: 提供 GitHub Gist 访问的 Token 获取功能 / File Description: Retrieves GitHub Gist access token from environment or config
+# 文件说明: 提取 Gist 访问 Token / File Description: Retrieves GitHub Gist access token from environment or config
+
 import json
+# 文件说明: 提供 GitHub Gist 访问的 Token 获取功能 / File Description: Retrieves GitHub Gist access token from environment or config
+
 import os
 
 from const import CONFIG_FILENAME, ROOT_PATH
