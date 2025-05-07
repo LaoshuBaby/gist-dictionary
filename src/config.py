@@ -1,38 +1,39 @@
-import json
-import os
+"""
+Configuration management for the gist-dictionary application.
+"""
+from typing import Dict, Any
 
-from const import CONFIG_FILENAME, ROOT_PATH
 from log import logger
+from utils import get_config, get_config_path, write_json_file
 
 
-def set_config():
+def set_config(new_config: Dict[str, Any]) -> bool:
     """
-    # 交互式填写必要信息和创建config
-    # 用户需要的gist需要自己手动创建好
-    # 本工具不会也不能为用户代办这个操作
-    # 以及这样可以保证在生成github token的时候授予最小权限
-    # 即只能读写一个gist就可以用
-    # 初次运行的时候自动生成config不属于这个函数的功能
+    Update the configuration file with new settings.
+    
+    Args:
+        new_config: Dictionary containing the new configuration
+        
+    Returns:
+        True if successful, False otherwise
     """
-    logger.info("请填写您的")
-    pass
+    return write_json_file(get_config_path(), new_config)
 
 
-def get_config() -> dict:
-    profile_path = os.path.join(ROOT_PATH, "config", CONFIG_FILENAME)
-    with open(profile_path, "r", encoding="utf-8") as f:
-        config = json.loads(f.read())
-        return config
-    return {}
-
-
-def init_config() -> dict:
+def init_config() -> Dict[str, Any]:
     """
-    # 逻辑，启动init的时候自动执行一个检测是否有config的检测
-    # 然后去获取（这时候一定是有文件的,因为前面进行了init_root_path）
-    # 如果获取到的里面有问题就要求用户填写信息。
-    # 然后整完直接整个覆盖到现有config文件上去
+    Initialize the configuration.
+    
+    This function checks if the configuration is valid and prompts the user
+    to fill in missing information if needed.
+    
+    Returns:
+        Dictionary containing the configuration
     """
     config = get_config()
-
+    
+    # Check if config has required fields
+    if not config.get("GH_TOKEN") or not config.get("config", {}).get("gist_name"):
+        logger.warning("Configuration is incomplete. Please set your GitHub token and Gist name.")
+    
     return config

@@ -1,15 +1,18 @@
-# 文件说明: 应用入口，启动 FastAPI 服务 / File Description: Application entrypoint launching FastAPI via uvicorn
-
-# 文件说明: 应用入口，启动 FastAPI 服务 / File Description: Application entrypoint launching FastAPI via uvicorn
-import uvicorn
+"""
+Application entrypoint that launches the FastAPI service via uvicorn.
+"""
 import os
+import uvicorn
 
 from server import app
 
 
 def main():
     """
-    Run the FastAPI application with uvicorn
+    Run the FastAPI application with uvicorn.
+    
+    Gets the port from environment variables or uses the default (12000).
+    Configures the server to listen on all interfaces.
     """
     # Get port from environment or use default
     port = int(os.environ.get("PORT", 12000))

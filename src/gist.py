@@ -1,78 +1,91 @@
-# 文件说明: GitHub Gist API 包装器 / File Description: Gist API helper for get and update operations
-# 文件说明: GitHub Gist API 包装器 / File Description: Gist API helper for get and update operations
+"""
+GitHub Gist API wrapper for retrieving and updating gists.
 
+This module provides functions to interact with GitHub Gist API for dictionary storage.
+"""
 import json
-from typing import Optional
+from typing import Optional, Dict, Any
 
 import requests
 
 from log import logger
 
-# 1
-# 需要注意的是，这里是我自己实现的GitHub Gist API
-# 当然这种库绝对是已经有了的
-# 因此后续更多时候还是用其他库，除非出错才会用自带库重试
-# 2
-# 需要获取的gist名字推荐提前放在配置文件里面，建议写一个init过程
-# 这块的读取文档在 https://docs.github.com/en/rest/gists/gists
-
+# Implementation selection
 IMPLEMENT = "local"
 
-# Optional value:
-# "local":
-# * impl made by me
-# "witherredaway":
-# * PyPi-[github-gists](https://pypi.org/project/github-gists/)
-# * GitHub-[WitherredAway/gists.py](https://github.com/WitherredAway/gists.py)
+# Available implementations:
+# "local": Custom implementation using requests
+# "witherredaway": Third-party library (github-gists from PyPI)
 
 
-def get_gist(auth_token: str, gist_id: str) -> Optional[str]:
+def get_github_headers(auth_token: str) -> Dict[str, str]:
     """
+    Create headers for GitHub API requests.
+    
+    Args:
+        auth_token: GitHub authentication token
+        
+    Returns:
+        Dictionary of HTTP headers
+    """
+    return {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {auth_token}",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+
+def get_gist(auth_token: str, gist_id: str, file_name: str = "wordbank.json") -> Optional[str]:
+    """
+    Retrieve a gist from GitHub.
+    
+    Args:
+        auth_token: GitHub authentication token
+        gist_id: ID of the gist to retrieve
+        file_name: Name of the file to retrieve from the gist
+        
+    Returns:
+        Content of the gist file or None if retrieval failed
+        
     Official API: https://docs.github.com/en/rest/gists/gists?apiVersion=2022-11-28#get-a-gist
     """
-
     if IMPLEMENT == "local":
         url = f"https://api.github.com/gists/{gist_id}"
-
-        headers = {
-            "Accept": "application/vnd.github+jso",
-            "Authorization": f"Bearer {auth_token}",
-            "X-GitHub-Api-Version": "2022-11-28",
-        }
+        headers = get_github_headers(auth_token)
 
         try:
             response = requests.get(url, headers=headers)
+            
+            if response.status_code == 200:
+                gist_metadata = response.json()
+                logger.trace(gist_metadata)
+                return gist_metadata.get("files", {}).get(file_name, {}).get("content")
+            else:
+                logger.error(f"Failed to retrieve gist: {response.status_code}")
+                logger.warning(response.text)
+                return None
+                
         except Exception as e:
-            logger.error(e)
-
-        if response.status_code == 200:
-            gist_metadata = response.json()
-            logger.trace(gist_metadata)
-        else:
-            logger.error(f"Failed to retrieve gist: {response.status_code}")
-            logger.warning(response.text)
-
-        gist_data = (
-            gist_metadata.get("files").get("wordbank.json").get("content")
-        )
+            logger.error(f"Error retrieving gist: {e}")
+            return None
+            
     elif IMPLEMENT == "witherredaway":
         import asyncio
-
         import gists
 
-        client = gists.Client()
-
         async def main_get():
-            # Getting a gist does not require authorization
-
-            # This method fetches the gist associated with the provided gist id, and returns a Gist object
-            gist = await client.get_gist("GIST ID")
+            client = gists.Client()
+            gist = await client.get_gist(gist_id)
             return gist
 
-        gist_data = asyncio.run(main_get())
+        try:
+            return asyncio.run(main_get())
+        except Exception as e:
+            logger.error(f"Error retrieving gist with witherredaway: {e}")
+            return None
     else:
-        gist_data = None
-    return gist_data
+        logger.error(f"Unknown implementation: {IMPLEMENT}")
+        return None
 
 
 def update_gist(
@@ -80,34 +93,39 @@ def update_gist(
     gist_id: str,
     gist_data: str,
     file_name: str = "wordbank.json",
-):
+) -> Optional[int]:
     """
+    Update a gist on GitHub.
+    
+    Args:
+        auth_token: GitHub authentication token
+        gist_id: ID of the gist to update
+        gist_data: New content for the gist file
+        file_name: Name of the file to update
+        
+    Returns:
+        HTTP status code or None if update failed
+        
     Official API: https://docs.github.com/en/rest/gists/gists?apiVersion=2022-11-28#update-a-gist
     """
     if IMPLEMENT == "local":
-
         url = f"https://api.github.com/gists/{gist_id}"
+        headers = get_github_headers(auth_token)
 
-        headers = {
-            "Accept": "application/vnd.github+jso",
-            "Authorization": f"Bearer {auth_token}",
-            "X-GitHub-Api-Version": "2022-11-28",
+        # Prepare payload
+        gist_data_payload = {
+            "files": {
+                file_name: {
+                    "content": gist_data
+                }
+            }
         }
-
-        logger.trace(gist_data)
-
-        gist_data_payload = json.loads(
-            '{"files":{"__FILE_NAME__":{"content":"__GIST_DATA__"}}}'.replace(
-                "__FILE_NAME__", file_name
-            )
-        )
-        gist_data_payload["files"][file_name]["content"] = gist_data
-        logger.trace(gist_data_payload)
+        
+        logger.trace(f"Updating gist with data: {gist_data}")
 
         try:
             response = requests.patch(
                 url,
-                
                 headers=headers,
                 data=json.dumps(
                     gist_data_payload,
@@ -116,15 +134,23 @@ def update_gist(
                     sort_keys=False,
                 ),
             )
+            
+            if response.status_code == 200:
+                logger.trace(f"Gist updated successfully: {response.text}")
+                return response.status_code
+            else:
+                logger.error(f"Failed to update gist: {response.status_code}")
+                logger.warning(response.text)
+                return response.status_code
+                
         except Exception as e:
-            logger.error(e)
-
-        if response.status_code == 200:
-            logger.trace(response.text)
-        else:
-            logger.error(f"Failed to update gist: {response.status_code}")
-            logger.warning(response.text)
-
-        return response.status_code
+            logger.error(f"Error updating gist: {e}")
+            return None
+            
+    elif IMPLEMENT == "witherredaway":
+        # Implementation for witherredaway library would go here
+        logger.error("witherredaway implementation for update_gist not implemented")
+        return None
     else:
+        logger.error(f"Unknown implementation: {IMPLEMENT}")
         return None

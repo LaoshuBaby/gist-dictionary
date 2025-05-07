@@ -1,28 +1,131 @@
-# 文件说明: 字典操作工具，处理词条和标签 / File Description: Dictionary manipulation utilities for entries and tags
+"""
+Dictionary manipulation utilities for entries and tags.
 
-# 因为最后上传dict的时候只需要一次性的上传，并且gist里面抽象出来的都是专门针对于github交互的api不涉及其他
-
-# 后续最好是针对输入类型返回特定的输出类型
-
-from typing import Union
+This module provides functions to manipulate dictionary entries and their tags.
+"""
 import json
-import uuid
+from typing import Dict, List, Optional, Union, Any
 
-from entry import Entry
+from dictionary import Dictionary, Entry, EntryCreate
+from log import logger
 
 
-def add_entry(current_dict:Union[dict,str],entry:Union[str,Entry],tags:list=[])->str:
+def parse_dictionary(dictionary_data: Union[str, Dict[str, Any]]) -> Dictionary:
     """
-    提供一个单纯的词或者一个对象，以及可能想一起添加的标签，来一次性添加到字典中
+    Parse dictionary data from string or dict into a Dictionary object.
+    
+    Args:
+        dictionary_data: Dictionary data as JSON string or dict
+        
+    Returns:
+        Dictionary object
     """
-    modified_dict=""
-    pass
-    return modified_dict
+    if isinstance(dictionary_data, str):
+        try:
+            data = json.loads(dictionary_data)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse dictionary JSON: {e}")
+            return Dictionary()
+    else:
+        data = dictionary_data
+    
+    # Create Dictionary object
+    dictionary = Dictionary()
+    
+    # Parse entries
+    for entry_data in data.get("wordbank", []):
+        try:
+            entry = Entry(
+                id=entry_data.get("id"),
+                word=entry_data.get("word"),
+                tags=entry_data.get("tags", [])
+            )
+            dictionary.wordbank.append(entry)
+        except Exception as e:
+            logger.error(f"Failed to parse entry: {e}")
+    
+    return dictionary
 
-def add_attribute(current_dict:Union[dict,str],entry_id:str,tags:list)->str:
+
+def add_entry(dictionary_data: Union[str, Dict[str, Any], Dictionary], 
+              word: str, 
+              tags: Optional[List[str]] = None) -> str:
     """
-    必须单独指定一个特定的entry才能对着它加
+    Add a new entry to the dictionary.
+    
+    Args:
+        dictionary_data: Dictionary data as JSON string, dict, or Dictionary object
+        word: Word to add
+        tags: Optional list of tags
+        
+    Returns:
+        Updated dictionary as JSON string
     """
-    modified_dict=""
-    pass
-    return modified_dict
+    # Parse dictionary if needed
+    if not isinstance(dictionary_data, Dictionary):
+        dictionary = parse_dictionary(dictionary_data)
+    else:
+        dictionary = dictionary_data
+    
+    # Create and add entry
+    entry = EntryCreate(word=word, tags=tags or [])
+    dictionary.add_entry(entry)
+    
+    # Return updated dictionary
+    return dictionary.to_json()
+
+
+def update_entry_tags(dictionary_data: Union[str, Dict[str, Any], Dictionary],
+                      entry_id: str,
+                      tags: List[str]) -> str:
+    """
+    Update tags for a specific entry.
+    
+    Args:
+        dictionary_data: Dictionary data as JSON string, dict, or Dictionary object
+        entry_id: ID of the entry to update
+        tags: New tags for the entry
+        
+    Returns:
+        Updated dictionary as JSON string
+    """
+    # Parse dictionary if needed
+    if not isinstance(dictionary_data, Dictionary):
+        dictionary = parse_dictionary(dictionary_data)
+    else:
+        dictionary = dictionary_data
+    
+    # Update entry tags
+    updated_entry = dictionary.update_entry_tags(entry_id, tags)
+    if not updated_entry:
+        logger.warning(f"Entry with ID {entry_id} not found")
+    
+    # Return updated dictionary
+    return dictionary.to_json()
+
+
+def delete_entry(dictionary_data: Union[str, Dict[str, Any], Dictionary],
+                 entry_id: str) -> str:
+    """
+    Delete an entry from the dictionary.
+    
+    Args:
+        dictionary_data: Dictionary data as JSON string, dict, or Dictionary object
+        entry_id: ID of the entry to delete
+        
+    Returns:
+        Updated dictionary as JSON string
+    """
+    # Parse dictionary if needed
+    if not isinstance(dictionary_data, Dictionary):
+        dictionary = parse_dictionary(dictionary_data)
+    else:
+        dictionary = dictionary_data
+    
+    # Delete entry
+    success = dictionary.delete_entry(entry_id)
+    if not success:
+        logger.warning(f"Entry with ID {entry_id} not found")
+    
+    # Return updated dictionary
+    return dictionary.to_json()
