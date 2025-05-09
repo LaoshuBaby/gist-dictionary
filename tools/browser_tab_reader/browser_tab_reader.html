@@ -139,6 +139,21 @@
         .error-status {
             color: #a94442;
         }
+        
+        .reload-btn {
+            padding: 4px 8px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 5px;
+        }
+        
+        .reload-btn:hover {
+            background-color: #0069d9;
+        }
     </style>
 </head>
 <body>
@@ -447,22 +462,45 @@
                 return;
             }
             
+            // Hide previous error messages and guides
+            document.getElementById('permissionsGuide').classList.add('hidden');
+            
             try {
                 showStatus(`${statusMessages.readingTabs.en}\n${statusMessages.readingTabs.zh}`, 'warning');
                 
-                // Check if browser.tabs API is available (Firefox only)
-                if (typeof browser !== 'undefined' && browser.tabs) {
-                    // Get all tabs from all windows
-                    const tabs = await browser.tabs.query({});
-                    processTabsData(tabs);
+                // Force reload browser object to ensure we get the latest state
+                if (typeof browser === 'undefined') {
+                    showStatus(`${statusMessages.requiresPermission.en}\n${statusMessages.requiresPermission.zh}`, 'error');
+                    document.getElementById('permissionsGuide').classList.remove('hidden');
+                    return;
+                }
+                
+                // Check if browser.tabs API is available and accessible
+                if (browser.tabs) {
+                    try {
+                        // Test the API with a simple query
+                        const tabs = await browser.tabs.query({});
+                        
+                        if (tabs && Array.isArray(tabs)) {
+                            // Success! Process the tabs
+                            processTabsData(tabs);
+                        } else {
+                            throw new Error("Invalid response from tabs API");
+                        }
+                    } catch (apiError) {
+                        console.error('Error accessing tabs API:', apiError);
+                        showStatus(`${statusMessages.requiresPermission.en}\n${statusMessages.requiresPermission.zh}`, 'error');
+                        document.getElementById('permissionsGuide').classList.remove('hidden');
+                    }
                 } else {
-                    // Fallback method for Firefox without extension permissions
+                    // browser object exists but tabs API is not available
                     showStatus(`${statusMessages.requiresPermission.en}\n${statusMessages.requiresPermission.zh}`, 'error');
                     document.getElementById('permissionsGuide').classList.remove('hidden');
                 }
             } catch (error) {
                 console.error('Error reading tabs:', error);
                 showStatus(`Error reading tabs: ${error.message}\n读取标签页时出错：${error.message}`, 'error');
+                document.getElementById('permissionsGuide').classList.remove('hidden');
             }
         }
 
@@ -673,54 +711,32 @@
                         extensionStatus.appendChild(document.createElement('br'));
                         extensionStatusZh.appendChild(document.createElement('br'));
                         
-                        // Create debugging link
-                        const debuggingLink = document.createElement('a');
-                        debuggingLink.href = 'about:debugging#/runtime/this-firefox';
-                        debuggingLink.target = '_blank';
-                        debuggingLink.textContent = 'Open about:debugging';
-                        debuggingLink.style.marginRight = '10px';
-                        extensionStatus.appendChild(debuggingLink);
+                        // Create instructions for about:debugging
+                        const debuggingInstructions = document.createElement('div');
+                        debuggingInstructions.innerHTML = `
+                            <p><strong>Next steps:</strong></p>
+                            <ol>
+                                <li>Type <code>about:debugging</code> in your Firefox address bar</li>
+                                <li>Click on "This Firefox" in the left sidebar</li>
+                                <li>Click "Load Temporary Add-on..."</li>
+                                <li>Navigate to the extracted folder and select the <code>manifest.json</code> file</li>
+                                <li>After installing, <button onclick="location.reload()" class="reload-btn">Refresh this page</button></li>
+                            </ol>
+                        `;
+                        extensionStatus.appendChild(debuggingInstructions);
                         
-                        const debuggingLinkZh = document.createElement('a');
-                        debuggingLinkZh.href = 'about:debugging#/runtime/this-firefox';
-                        debuggingLinkZh.target = '_blank';
-                        debuggingLinkZh.textContent = '打开 about:debugging';
-                        debuggingLinkZh.style.marginRight = '10px';
-                        extensionStatusZh.appendChild(debuggingLinkZh);
-                        
-                        // Add auto-install button (this will only work if the user has already granted permissions)
-                        const autoInstallBtn = document.createElement('button');
-                        autoInstallBtn.textContent = 'Try Auto-Install';
-                        autoInstallBtn.className = 'extension-btn';
-                        autoInstallBtn.onclick = function() {
-                            try {
-                                // This will only work if Firefox has already granted the necessary permissions
-                                // and the browser.management API is available
-                                if (typeof browser !== 'undefined' && browser.management) {
-                                    browser.management.installTemporaryAddon(zipUrl)
-                                        .then(() => {
-                                            alert('Extension installed successfully! Please refresh this page.');
-                                            location.reload();
-                                        })
-                                        .catch(err => {
-                                            alert('Auto-install failed. Please install manually: ' + err.message);
-                                        });
-                                } else {
-                                    window.open('about:debugging#/runtime/this-firefox', '_blank');
-                                    alert('Auto-install is not available. Please install the extension manually through about:debugging.');
-                                }
-                            } catch (err) {
-                                window.open('about:debugging#/runtime/this-firefox', '_blank');
-                                alert('Auto-install failed. Please install manually: ' + err.message);
-                            }
-                        };
-                        extensionStatus.appendChild(autoInstallBtn);
-                        
-                        const autoInstallBtnZh = document.createElement('button');
-                        autoInstallBtnZh.textContent = '尝试自动安装';
-                        autoInstallBtnZh.className = 'extension-btn';
-                        autoInstallBtnZh.onclick = autoInstallBtn.onclick;
-                        extensionStatusZh.appendChild(autoInstallBtnZh);
+                        const debuggingInstructionsZh = document.createElement('div');
+                        debuggingInstructionsZh.innerHTML = `
+                            <p><strong>后续步骤：</strong></p>
+                            <ol>
+                                <li>在Firefox地址栏中输入 <code>about:debugging</code></li>
+                                <li>点击左侧边栏中的"此Firefox"</li>
+                                <li>点击"临时载入附加组件..."</li>
+                                <li>导航到解压后的文件夹并选择 <code>manifest.json</code> 文件</li>
+                                <li>安装后，<button onclick="location.reload()" class="reload-btn">刷新此页面</button></li>
+                            </ol>
+                        `;
+                        extensionStatusZh.appendChild(debuggingInstructionsZh);
                     });
             } catch (error) {
                 console.error('Error creating extension files:', error);
