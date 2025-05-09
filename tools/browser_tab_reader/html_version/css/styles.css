@@ -1,0 +1,136 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    line-height: 1.6;
+}
+h1, h2, h3 {
+    color: #333;
+}
+.container {
+    margin-bottom: 30px;
+}
+.instructions {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+.dictionary-tabs {
+    margin-top: 20px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.buttons {
+    margin: 20px 0;
+}
+button {
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+button:hover {
+    background-color: #45a049;
+}
+#status {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+}
+.success {
+    background-color: #dff0d8;
+    color: #3c763d;
+}
+.error {
+    background-color: #f2dede;
+    color: #a94442;
+}
+.warning {
+    background-color: #fcf8e3;
+    color: #8a6d3b;
+}
+.hidden {
+    display: none;
+}
+#searchInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+/* Bilingual styling */
+.guide-english, .guide-chinese {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 5px;
+}
+.guide-english {
+    background-color: #f0f8ff;
+}
+.guide-chinese {
+    background-color: #fff0f0;
+}
+.quick-setup {
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #e8f5e9;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+}
+.extension-btn {
+    padding: 8px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+.extension-btn:hover {
+    background-color: #45a049;
+}
+#extensionStatus, #extensionStatusZh {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.success-status {
+    color: #3c763d;
+}
+.error-status {
+    color: #a94442;
+}
+.reload-btn {
+    padding: 4px 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-left: 5px;
+}
+.reload-btn:hover {
+    background-color: #0069d9;
+}
