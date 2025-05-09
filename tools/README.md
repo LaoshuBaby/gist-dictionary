@@ -4,67 +4,39 @@ This directory contains various tools to help prepare, import, and manipulate di
 
 ## Available Tools
 
-### Browser Tab Reader
+| Tool ID | Name | Description | Status |
+|---------|------|-------------|--------|
+| browser_tab_reader | [Browser Tab Reader](browser_tab_reader/) | Extract vocabulary from browser tabs | Available |
+| anki_import | [Anki Import Tool](anki_import/) | Convert Anki decks to gist-dictionary format | Planned |
+| ocr_dictionary | [OCR Dictionary Tool](ocr_dictionary/) | Extract vocabulary from dictionary app screenshots | Planned |
+| csv_excel_converter | [CSV/Excel Converter](csv_excel_converter/) | Convert CSV/Excel vocabulary lists | Planned |
 
-A tool to extract and process vocabulary from your browser tabs. This tool reads Firefox's existing tabs, sorts them by their actual tab order, retrieves their creation/visiting time, and identifies tabs from dictionary sites.
+Each tool is contained in its own directory with a dedicated README.md file that includes:
+- Feature description
+- Usage instructions
+- Dependencies
 
-**Features:**
-- Read Firefox's existing tabs
-- Sort tabs by their actual tab order
-- Get tab creation/visiting time
-- Identify tabs from dictionary sites
-- Export dictionary site data for gist-dictionary
+## Installation
 
-**Usage:**
+The tools can be installed using Poetry. See the main project's pyproject.toml for installation instructions.
+
+### Basic Installation
+
 ```bash
-python browser_tab_reader.py --profile-path /path/to/firefox/profile --dict-sites-file dictionary_sites.txt
+# Install the base package
+poetry install
 ```
 
-### Anki Import Tool
+### Install with Tool Dependencies
 
-Convert Anki decks into a format compatible with gist-dictionary.
+```bash
+# Install with specific tool dependencies
+poetry install --extras "browser_tab_reader"
+poetry install --extras "ocr_dictionary"
 
-**Features:**
-- Import vocabulary and definitions from Anki decks
-- Preserve tags, notes, and example sentences
-- Handle media files (audio, images)
-- Support for various Anki deck formats
-
-**Usage:** (Coming soon)
-
-### OCR Dictionary Tool
-
-Extract vocabulary and definitions from dictionary app screenshots using Optical Character Recognition (OCR).
-
-**Features:**
-- Process screenshots from popular dictionary apps
-- Extract word, pronunciation, definition, and examples
-- Support for multiple languages
-- Batch processing capability
-
-**Dependencies:**
-- Tesseract OCR
-- Python libraries: pytesseract, opencv-python, pillow
-
-**Usage:** (Coming soon)
-
-### CSV/Excel Converter
-
-Convert vocabulary lists from CSV or Excel files to gist-dictionary format.
-
-**Features:**
-- Support for various CSV/Excel formats
-- Column mapping configuration
-- Batch processing
-
-**Usage:** (Coming soon)
-
-## Planned Tools
-
-- **Web Scraper**: Extract vocabulary from specific websites
-- **PDF Extractor**: Extract vocabulary and definitions from PDF dictionaries
-- **Audio Processor**: Process and attach audio pronunciations to entries
-- **Subtitle Vocabulary Extractor**: Extract vocabulary from movie/TV subtitles
+# Install all tool dependencies
+poetry install --extras "all"
+```
 
 ## Contributing
 

@@ -1,6 +1,63 @@
-# gist-dictionary
+# Gist Dictionary
 
 使用GitHub Gist存储多来源数据的词典 | Multi-source dictionary that using GitHub Gist for storage | GitHub Gist でストレージの辞書
+
+## Overview
+
+Gist Dictionary is a tool for collecting and organizing vocabulary from multiple sources. It uses GitHub Gist for storage, allowing you to track changes to your vocabulary lists over time.
+
+## Features
+
+- Store vocabulary from multiple languages (English, Japanese, Korean, etc.)
+- Link to online dictionaries for detailed explanations
+- Track changes to your vocabulary lists using Git
+- Import vocabulary from various sources (browser tabs, Anki decks, screenshots, etc.)
+
+## Installation
+
+### Using Poetry (Recommended)
+
+```bash
+# Clone the repository
+git clone https://github.com/LaoshuBaby/gist-dictionary.git
+cd gist-dictionary
+
+# Install with Poetry
+poetry install  # Basic installation
+
+# Install with specific tool dependencies
+poetry install --extras "browser_tab_reader"
+poetry install --extras "ocr_dictionary"
+
+# Install all tool dependencies
+poetry install --extras "all"
+```
+
+### Using pip
+
+```bash
+# Clone the repository
+git clone https://github.com/LaoshuBaby/gist-dictionary.git
+cd gist-dictionary
+
+# Install with pip
+pip install -e .  # Basic installation
+pip install -e ".[browser_tab_reader]"  # With specific tool
+pip install -e ".[all]"  # With all tools
+```
+
+## Tools
+
+The project includes various tools to help import and manage vocabulary:
+
+| Tool | Description |
+|------|-------------|
+| [Browser Tab Reader](tools/browser_tab_reader/) | Extract vocabulary from browser tabs |
+| [Anki Import](tools/anki_import/) | Convert Anki decks to gist-dictionary format |
+| [OCR Dictionary](tools/ocr_dictionary/) | Extract vocabulary from dictionary app screenshots |
+| [CSV/Excel Converter](tools/csv_excel_converter/) | Convert CSV/Excel vocabulary lists |
+
+See the [tools directory](tools/) for more information.
 
 ## 代码结构
 
