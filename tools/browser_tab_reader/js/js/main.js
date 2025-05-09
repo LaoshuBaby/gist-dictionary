@@ -1,21 +1,20 @@
-// Dictionary site patterns
-const dictionarySites = [
-    { domain: "dictionary.com", pattern: /\/browse\/([^\/\?#]+)/ },
-    { domain: "merriam-webster.com", pattern: /\/dictionary\/([^\/\?#]+)/ },
-    { domain: "vocabulary.com", pattern: /\/dictionary\/([^\/\?#]+)/ },
-    { domain: "thefreedictionary.com", pattern: /\/([^\/\?#]+)$/ },
-    { domain: "dictionary.cambridge.org", pattern: /\/dictionary\/[^\/]+\/([^\/\?#]+)/ },
-    { domain: "oxforddictionaries.com", pattern: /\/definition\/([^\/\?#]+)/ },
-    { domain: "collinsdictionary.com", pattern: /\/dictionary\/[^\/]+\/([^\/\?#]+)/ },
-    { domain: "macmillandictionary.com", pattern: /\/dictionary\/[^\/]+\/([^\/\?#]+)/ },
-    { domain: "ldoceonline.com", pattern: /\/dictionary\/[^\/]+\/([^\/\?#]+)/ },
-    { domain: "lexico.com", pattern: /\/definition\/([^\/\?#]+)/ },
-    { domain: "etymonline.com", pattern: /\/word\/([^\/\?#]+)/ },
-    { domain: "wordreference.com", pattern: /\/([^\/\?#]+)$/ },
-    { domain: "urbandictionary.com", pattern: /\/define\.php\?term=([^&]+)/ },
-    { domain: "wiktionary.org", pattern: /\/wiki\/([^:]+)$/ },
-    { domain: "thesaurus.com", pattern: /\/browse\/([^\/\?#]+)/ }
-];
+// Dictionary site patterns (loaded from rules.json)
+let dictionarySites = [];
+
+// Load dictionary rules
+async function loadDictionaryRules() {
+    try {
+        const response = await fetch(browser.runtime.getURL('rules.json'));
+        dictionarySites = await response.json();
+    } catch (error) {
+        console.error('Failed to load rules:', error);
+        // Fallback to default rules
+        dictionarySites = [
+            { domain: "dictionary.com", pattern: "/browse/([^/?#]+)" },
+            { domain: "merriam-webster.com", pattern: "/dictionary/([^/?#]+)" }
+        ];
+    }
+}
 
 // Global variables
 let allTabs = [];
@@ -61,10 +60,35 @@ function extractSearchTerm(url, domain) {
 }
 
 // Initialize the application
-function init() {
+async function init() {
+    await loadDictionaryRules();
+    setupMessageHandler();
     document.getElementById('readTabsBtn').addEventListener('click', readTabs);
     document.getElementById('saveJsonBtn').addEventListener('click', saveJson);
     document.getElementById('copyJsonBtn').addEventListener('click', copyJson);
+}
+
+// Message handler for extension responses
+function setupMessageHandler() {
+    window.addEventListener('message', (event) => {
+        if (event.source !== window) return;
+        
+        if (event.data.type === 'GET_TABS_RESPONSE') {
+            if (event.data.success) {
+                allTabs = event.data.tabs;
+                dictionaryTabs = allTabs
+                    .filter(tab => dictionarySites.some(site => tab.url.includes(site.domain)))
+                    .map(tab => ({
+                        ...tab,
+                        searchTerm: extractSearchTerm(tab.url, tab.url.match(/:\/\/(.[^/]+)/)[1])
+                    }));
+                updateResultsTable();
+                showStatus(`Found ${dictionaryTabs.length} dictionary tabs`, 'success');
+            } else {
+                showStatus(`Failed to read tabs: ${event.data.error}`, 'error');
+            }
+        }
+    });
 }
 
 // Read and process browser tabs
@@ -75,27 +99,9 @@ function readTabs() {
     }
 
     showStatus('Reading tabs...', 'info');
-    
-    browser.tabs.query({})
-        .then(tabs => {
-            allTabs = tabs;
-            dictionaryTabs = tabs
-                .filter(tab => dictionarySites.some(site => tab.url.includes(site.domain)))
-                .map(tab => ({
-                    ...tab,
-                    searchTerm: extractSearchTerm(tab.url, tab.url.match(/:\/\/(.[^/]+)/)[1])
-                }));
-            
-            updateResultsTable();
-            document.getElementById('saveJsonBtn').disabled = false;
-            document.getElementById('copyJsonBtn').disabled = false;
-            showStatus(`Found ${dictionaryTabs.length} dictionary tabs`, 'success');
-        })
-        .catch(err => {
-            console.error('Error reading tabs:', err);
-            showStatus('Failed to read tabs. Make sure you have tabs permission.', 'error');
-            document.getElementById('permissionsGuide').classList.remove('hidden');
-        });
+    window.postMessage({ type: 'GET_TABS' }, '*');
+    document.getElementById('saveJsonBtn').disabled = true;
+    document.getElementById('copyJsonBtn').disabled = true;
 }
 
 // Update the results table with found dictionary tabs
