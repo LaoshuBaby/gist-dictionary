@@ -85,46 +85,74 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+        
+        /* Bilingual styling */
+        .guide-english, .guide-chinese {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .guide-english {
+            background-color: #f0f8ff;
+        }
+        
+        .guide-chinese {
+            background-color: #fff0f0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Firefox Tab Reader</h1>
-        <h2>Browser Tab Dictionary Tool</h2>
+        <h1>Firefox Tab Reader / Firefox 标签页阅读器</h1>
+        <h2>Browser Tab Dictionary Tool / 浏览器标签页词典工具</h2>
         
         <div class="instructions">
-            <h3>Instructions:</h3>
-            <p>This tool extracts all your open Firefox tabs and identifies dictionary websites. It works directly in your browser without requiring any installation or access to your Firefox profile directory.</p>
-            <ol>
-                <li>Click the "Read Tabs" button below to extract all your currently open tabs.</li>
-                <li>The tool will identify dictionary websites and display them in a table.</li>
-                <li>You can save the results as a JSON file for use with gist-dictionary.</li>
-            </ol>
-            <p><strong>Note:</strong> This tool only works when opened in Firefox, as it needs access to your current browser tabs.</p>
+            <h3>Instructions / 使用说明:</h3>
+            
+            <div class="guide-english">
+                <p>This tool extracts all your open Firefox tabs and identifies dictionary websites. It works directly in your browser without requiring any installation or access to your Firefox profile directory.</p>
+                <ol>
+                    <li>Click the "Read Tabs" button below to extract all your currently open tabs.</li>
+                    <li>The tool will identify dictionary websites and display them in a table.</li>
+                    <li>You can save the results as a JSON file for use with gist-dictionary.</li>
+                </ol>
+                <p><strong>Note:</strong> This tool only works when opened in Firefox, as it needs access to your current browser tabs.</p>
+            </div>
+            
+            <div class="guide-chinese">
+                <p>此工具提取您所有打开的Firefox标签页并识别词典网站。它直接在您的浏览器中工作，无需安装或访问您的Firefox配置文件目录。</p>
+                <ol>
+                    <li>点击下方的"读取标签页"按钮以提取您当前打开的所有标签页。</li>
+                    <li>该工具将识别词典网站并在表格中显示它们。</li>
+                    <li>您可以将结果保存为JSON文件，以便与gist-dictionary一起使用。</li>
+                </ol>
+                <p><strong>注意：</strong>此工具仅在Firefox中打开时有效，因为它需要访问您当前的浏览器标签页。</p>
+            </div>
         </div>
         
         <div class="buttons">
-            <button id="readTabsBtn">Read Tabs</button>
-            <button id="saveJsonBtn" disabled>Save as JSON</button>
-            <button id="copyJsonBtn" disabled>Copy JSON</button>
+            <button id="readTabsBtn">Read Tabs / 读取标签页</button>
+            <button id="saveJsonBtn" disabled>Save as JSON / 保存为JSON</button>
+            <button id="copyJsonBtn" disabled>Copy JSON / 复制JSON</button>
         </div>
         
         <div id="status" class="hidden"></div>
         
         <div class="dictionary-tabs hidden" id="resultsContainer">
-            <h3>Dictionary Tabs</h3>
-            <p>Found <span id="dictTabCount">0</span> dictionary tabs out of <span id="totalTabCount">0</span> total tabs.</p>
+            <h3>Dictionary Tabs / 词典标签页</h3>
+            <p>Found <span id="dictTabCount">0</span> dictionary tabs out of <span id="totalTabCount">0</span> total tabs. / 在总共 <span id="totalTabCount">0</span> 个标签页中找到 <span id="dictTabCount">0</span> 个词典标签页。</p>
             
-            <input type="text" id="searchInput" placeholder="Search tabs...">
+            <input type="text" id="searchInput" placeholder="Search tabs... / 搜索标签页...">
             
             <table id="tabsTable">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Title</th>
-                        <th>URL</th>
-                        <th>Dictionary</th>
-                        <th>Search Term</th>
+                        <th>Title / 标题</th>
+                        <th>URL / 网址</th>
+                        <th>Dictionary / 词典</th>
+                        <th>Search Term / 搜索词</th>
                     </tr>
                 </thead>
                 <tbody id="tabsTableBody">
@@ -134,8 +162,94 @@
         </div>
         
         <div id="jsonOutput" class="hidden">
-            <h3>JSON Output</h3>
+            <h3>JSON Output / JSON 输出</h3>
             <pre id="jsonContent"></pre>
+        </div>
+        
+        <div id="permissionsGuide" class="hidden instructions">
+            <h3>How to Enable Tabs Permission in Firefox / 如何在Firefox中启用标签页权限</h3>
+            
+            <div class="guide-english">
+                <h4>English Instructions:</h4>
+                <ol>
+                    <li>Create a Firefox Extension:
+                        <ol>
+                            <li>Create a new folder on your computer for the extension</li>
+                            <li>Inside this folder, create a file named <code>manifest.json</code> with the following content:
+                                <pre>
+{
+  "manifest_version": 2,
+  "name": "Tab Reader",
+  "version": "1.0",
+  "description": "Reads browser tabs",
+  "permissions": ["tabs"],
+  "browser_action": {
+    "default_title": "Tab Reader"
+  }
+}
+                                </pre>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>Load the Extension in Firefox:
+                        <ol>
+                            <li>Open Firefox and type <code>about:debugging</code> in the address bar</li>
+                            <li>Click on "This Firefox" in the left sidebar</li>
+                            <li>Click "Load Temporary Add-on..."</li>
+                            <li>Navigate to your extension folder and select the <code>manifest.json</code> file</li>
+                        </ol>
+                    </li>
+                    <li>Use This Tool:
+                        <ol>
+                            <li>After installing the extension, refresh this page</li>
+                            <li>Click the "Read Tabs" button again</li>
+                            <li>The tool should now be able to access your tabs</li>
+                        </ol>
+                    </li>
+                </ol>
+                <p><strong>Note:</strong> This temporary extension will be removed when you close Firefox.</p>
+            </div>
+            
+            <div class="guide-chinese">
+                <h4>中文说明：</h4>
+                <ol>
+                    <li>创建Firefox扩展：
+                        <ol>
+                            <li>在您的计算机上为扩展创建一个新文件夹</li>
+                            <li>在此文件夹中，创建一个名为<code>manifest.json</code>的文件，内容如下：
+                                <pre>
+{
+  "manifest_version": 2,
+  "name": "Tab Reader",
+  "version": "1.0",
+  "description": "Reads browser tabs",
+  "permissions": ["tabs"],
+  "browser_action": {
+    "default_title": "Tab Reader"
+  }
+}
+                                </pre>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>在Firefox中加载扩展：
+                        <ol>
+                            <li>打开Firefox并在地址栏中输入<code>about:debugging</code></li>
+                            <li>点击左侧边栏中的"此Firefox"</li>
+                            <li>点击"临时载入附加组件..."</li>
+                            <li>导航到您的扩展文件夹并选择<code>manifest.json</code>文件</li>
+                        </ol>
+                    </li>
+                    <li>使用此工具：
+                        <ol>
+                            <li>安装扩展后，刷新此页面</li>
+                            <li>再次点击"读取标签页"按钮</li>
+                            <li>该工具现在应该能够访问您的标签页</li>
+                        </ol>
+                    </li>
+                </ol>
+                <p><strong>注意：</strong>当您关闭Firefox时，此临时扩展将被移除。</p>
+            </div>
         </div>
     </div>
 
@@ -186,6 +300,34 @@
             statusDiv.textContent = message;
             statusDiv.className = type;
             statusDiv.classList.remove('hidden');
+        }
+        
+        // Bilingual status messages
+        const statusMessages = {
+            readingTabs: {
+                en: 'Reading tabs...',
+                zh: '正在读取标签页...'
+            },
+            requiresPermission: {
+                en: 'This tool requires Firefox with the "tabs" permission. Please see instructions below.',
+                zh: '此工具需要具有"tabs"权限的Firefox。请参阅下面的说明。'
+            },
+            onlyFirefox: {
+                en: 'This tool only works in Firefox. Please open it in Firefox browser.',
+                zh: '此工具仅适用于Firefox。请在Firefox浏览器中打开它。'
+            },
+            foundTabs: {
+                en: (dictCount, totalCount) => `Found ${dictCount} dictionary tabs out of ${totalCount} total tabs.`,
+                zh: (dictCount, totalCount) => `在总共 ${totalCount} 个标签页中找到 ${dictCount} 个词典标签页。`
+            },
+            jsonSaved: {
+                en: 'JSON file saved successfully!',
+                zh: 'JSON文件保存成功！'
+            },
+            jsonCopied: {
+                en: 'JSON copied to clipboard!',
+                zh: 'JSON已复制到剪贴板！'
+            }
         }
 
         // Extract search term from URL
@@ -252,12 +394,12 @@
         // Read tabs from browser
         async function readTabs() {
             if (!isFirefox()) {
-                showStatus('This tool only works in Firefox. Please open it in Firefox browser.', 'error');
+                showStatus(`${statusMessages.onlyFirefox.en}\n${statusMessages.onlyFirefox.zh}`, 'error');
                 return;
             }
             
             try {
-                showStatus('Reading tabs...', 'warning');
+                showStatus(`${statusMessages.readingTabs.en}\n${statusMessages.readingTabs.zh}`, 'warning');
                 
                 // Check if browser.tabs API is available (Firefox only)
                 if (typeof browser !== 'undefined' && browser.tabs) {
@@ -266,11 +408,12 @@
                     processTabsData(tabs);
                 } else {
                     // Fallback method for Firefox without extension permissions
-                    showStatus('This tool requires Firefox with the "tabs" permission. Please use the Python version instead.', 'error');
+                    showStatus(`${statusMessages.requiresPermission.en}\n${statusMessages.requiresPermission.zh}`, 'error');
+                    document.getElementById('permissionsGuide').classList.remove('hidden');
                 }
             } catch (error) {
                 console.error('Error reading tabs:', error);
-                showStatus('Error reading tabs: ' + error.message, 'error');
+                showStatus(`Error reading tabs: ${error.message}\n读取标签页时出错：${error.message}`, 'error');
             }
         }
 
@@ -309,7 +452,9 @@
             saveJsonBtn.disabled = false;
             copyJsonBtn.disabled = false;
             
-            showStatus(`Found ${dictionaryTabs.length} dictionary tabs out of ${allTabs.length} total tabs.`, 'success');
+            const enMessage = statusMessages.foundTabs.en(dictionaryTabs.length, allTabs.length);
+            const zhMessage = statusMessages.foundTabs.zh(dictionaryTabs.length, allTabs.length);
+            showStatus(`${enMessage}\n${zhMessage}`, 'success');
             resultsContainer.classList.remove('hidden');
             
             // Generate JSON
@@ -370,7 +515,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showStatus('JSON file saved successfully!', 'success');
+            showStatus(`${statusMessages.jsonSaved.en}\n${statusMessages.jsonSaved.zh}`, 'success');
         }
 
         // Copy JSON to clipboard
@@ -386,11 +531,11 @@
             
             navigator.clipboard.writeText(jsonString)
                 .then(() => {
-                    showStatus('JSON copied to clipboard!', 'success');
+                    showStatus(`${statusMessages.jsonCopied.en}\n${statusMessages.jsonCopied.zh}`, 'success');
                 })
                 .catch(err => {
                     console.error('Error copying to clipboard:', err);
-                    showStatus('Error copying to clipboard: ' + err.message, 'error');
+                    showStatus(`Error copying to clipboard: ${err.message}\n复制到剪贴板时出错：${err.message}`, 'error');
                 });
         }
 
@@ -436,7 +581,7 @@
         // Check if Firefox on page load
         document.addEventListener('DOMContentLoaded', () => {
             if (!isFirefox()) {
-                showStatus('This tool only works in Firefox. Please open it in Firefox browser.', 'error');
+                showStatus(`${statusMessages.onlyFirefox.en}\n${statusMessages.onlyFirefox.zh}`, 'error');
                 readTabsBtn.disabled = true;
             }
         });
