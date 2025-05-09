@@ -152,8 +152,11 @@ python browser_tab_reader.py --output my_dictionary_tabs.json
 ## Usage
 ## 使用方法
 
-### Basic Usage
-### 基本用法
+### Method 1: Python Script
+### 方法1：Python脚本
+
+#### Basic Usage
+#### 基本用法
 
 ```bash
 python browser_tab_reader.py
@@ -163,12 +166,27 @@ This will automatically find your Firefox profile and use a default list of dict
 
 这将自动查找你的Firefox配置文件并使用默认的词典网站列表。
 
-### Advanced Usage
-### 高级用法
+#### Advanced Usage
+#### 高级用法
 
 ```bash
 python browser_tab_reader.py --profile-path /path/to/firefox/profile --dict-sites-file dictionary_sites.txt --output dictionary_tabs.json
 ```
+
+### Method 2: HTML-Based Alternative
+### 方法2：基于HTML的替代方案
+
+For users who prefer a browser-based approach or have trouble with the Python script, we provide an HTML-based alternative:
+
+对于偏好基于浏览器的方法或在使用Python脚本时遇到问题的用户，我们提供了一个基于HTML的替代方案：
+
+1. Open the `browser_tab_reader.html` file in Firefox
+2. Click the "Read Tabs" button to extract tabs
+3. Save the results as JSON
+
+Note: The HTML version only works in Firefox and requires browser permissions to access tabs.
+
+注意：HTML版本仅在Firefox中工作，并且需要浏览器权限才能访问标签页。
 
 ### Parameters
 ### 参数
@@ -214,22 +232,43 @@ This script creates a sample Firefox profile with some tabs, including dictionar
 ## How It Works
 ## 工作原理
 
+### Python Script Method
+### Python脚本方法
+
 1. The tool locates Firefox profile directories on your system
-2. It reads session data from `sessionstore.js` or `sessionstore-backups/recovery.js`
+2. It reads session data from `sessionstore.js`, `sessionstore-backups/recovery.js`, or compressed `.jsonlz4` files
 3. It extracts tab information including URL, title, creation time, and last accessed time
 4. It checks if each tab is from a dictionary site
 5. For dictionary sites, it attempts to extract the search term from the URL
 6. It outputs the results to the console or a JSON file
 
 1. 该工具在你的系统上定位Firefox配置文件目录
-2. 它从`sessionstore.js`或`sessionstore-backups/recovery.js`读取会话数据
+2. 它从`sessionstore.js`、`sessionstore-backups/recovery.js`或压缩的`.jsonlz4`文件读取会话数据
 3. 它提取标签页信息，包括URL、标题、创建时间和最后访问时间
 4. 它检查每个标签页是否来自词典网站
 5. 对于词典网站，它尝试从URL中提取搜索词
 6. 它将结果输出到控制台或JSON文件
 
+### HTML-Based Method
+### 基于HTML的方法
+
+1. The HTML file is opened directly in Firefox
+2. When the "Read Tabs" button is clicked, it attempts to access the browser's tabs API
+3. It extracts tab information directly from the browser
+4. It identifies dictionary sites and extracts search terms
+5. Results are displayed in a table and can be saved as JSON
+
+1. HTML文件直接在Firefox中打开
+2. 当点击"Read Tabs"按钮时，它尝试访问浏览器的标签页API
+3. 它直接从浏览器提取标签页信息
+4. 它识别词典网站并提取搜索词
+5. 结果显示在表格中，并可以保存为JSON
+
 ## Limitations
 ## 局限性
+
+### Python Script Limitations
+### Python脚本局限性
 
 - The tool can only read Firefox tabs, not other browsers
 - It relies on Firefox's session files, which might change format in future Firefox versions
@@ -240,6 +279,21 @@ This script creates a sample Firefox profile with some tabs, including dictionar
 - 它依赖于Firefox的会话文件，这些文件的格式可能在未来的Firefox版本中发生变化
 - 它只能从已知的词典网站URL模式中提取搜索词
 - 它不能访问标签页的实际内容，只能访问URL和元数据
+
+### HTML-Based Limitations
+### 基于HTML的局限性
+
+- Only works when opened in Firefox (not in other browsers)
+- Requires Firefox permissions to access tabs
+- Cannot access browser history or closed tabs
+- May require browser extensions or special permissions in some Firefox versions
+- Cannot retrieve detailed tab metadata like creation time
+
+- 仅在Firefox中打开时有效（不适用于其他浏览器）
+- 需要Firefox权限才能访问标签页
+- 无法访问浏览器历史记录或已关闭的标签页
+- 在某些Firefox版本中可能需要浏览器扩展或特殊权限
+- 无法检索详细的标签页元数据，如创建时间
 
 ## Integration with gist-dictionary
 ## 与gist-dictionary的集成

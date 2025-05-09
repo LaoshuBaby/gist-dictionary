@@ -35,8 +35,10 @@ def find_firefox_profiles():
                 if profile_dir.is_dir():
                     # Check if this looks like a Firefox profile (has places.sqlite or sessionstore files)
                     has_places = (profile_dir / "places.sqlite").exists()
-                    has_session = any((profile_dir / "sessionstore.js").exists(),
-                                     (profile_dir / "sessionstore-backups").exists())
+                    has_session = any([
+                        (profile_dir / "sessionstore.js").exists(),
+                        (profile_dir / "sessionstore-backups").exists()
+                    ])
                     
                     if has_places or has_session:
                         profiles.append(profile_dir)

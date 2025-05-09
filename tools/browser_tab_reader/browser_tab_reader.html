@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firefox Tab Reader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .container {
+            margin-bottom: 30px;
+        }
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .dictionary-tabs {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .buttons {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .warning {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+        }
+        .hidden {
+            display: none;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Firefox Tab Reader</h1>
+        <h2>Browser Tab Dictionary Tool</h2>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <p>This tool extracts all your open Firefox tabs and identifies dictionary websites. It works directly in your browser without requiring any installation or access to your Firefox profile directory.</p>
+            <ol>
+                <li>Click the "Read Tabs" button below to extract all your currently open tabs.</li>
+                <li>The tool will identify dictionary websites and display them in a table.</li>
+                <li>You can save the results as a JSON file for use with gist-dictionary.</li>
+            </ol>
+            <p><strong>Note:</strong> This tool only works when opened in Firefox, as it needs access to your current browser tabs.</p>
+        </div>
+        
+        <div class="buttons">
+            <button id="readTabsBtn">Read Tabs</button>
+            <button id="saveJsonBtn" disabled>Save as JSON</button>
+            <button id="copyJsonBtn" disabled>Copy JSON</button>
+        </div>
+        
+        <div id="status" class="hidden"></div>
+        
+        <div class="dictionary-tabs hidden" id="resultsContainer">
+            <h3>Dictionary Tabs</h3>
+            <p>Found <span id="dictTabCount">0</span> dictionary tabs out of <span id="totalTabCount">0</span> total tabs.</p>
+            
+            <input type="text" id="searchInput" placeholder="Search tabs...">
+            
+            <table id="tabsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>URL</th>
+                        <th>Dictionary</th>
+                        <th>Search Term</th>
+                    </tr>
+                </thead>
+                <tbody id="tabsTableBody">
+                    <!-- Table rows will be added here dynamically -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="jsonOutput" class="hidden">
+            <h3>JSON Output</h3>
+            <pre id="jsonContent"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Dictionary site patterns
+        const dictionarySites = [
+            { domain: "dictionary.com", pattern: /\/browse\/([^\/\?#]+)/ },
+            { domain: "merriam-webster.com", pattern: /\/dictionary\/([^\/\?#]+)/ },
+            { domain: "vocabulary.com", pattern: /\/dictionary\/([^\/\?#]+)/ },
+            { domain: "thefreedictionary.com", pattern: /\/([^\/\?#]+)$/ },
+            { domain: "dictionary.cambridge.org", pattern: /\/dictionary\/[^\/]+\/([^\/\?#]+)/ },
+            { domain: "oxforddictionaries.com", pattern: /\/definition\/([^\/\?#]+)/ },
+            { domain: "collinsdictionary.com", pattern: /\/dictionary\/[^\/]+\/([^\/\?#]+)/ },
+            { domain: "macmillandictionary.com", pattern: /\/dictionary\/[^\/]+\/([^\/\?#]+)/ },
+            { domain: "ldoceonline.com", pattern: /\/dictionary\/[^\/]+\/([^\/\?#]+)/ },
+            { domain: "lexico.com", pattern: /\/definition\/([^\/\?#]+)/ },
+            { domain: "etymonline.com", pattern: /\/word\/([^\/\?#]+)/ },
+            { domain: "wordreference.com", pattern: /\/([^\/\?#]+)$/ },
+            { domain: "urbandictionary.com", pattern: /\/define\.php\?term=([^&]+)/ },
+            { domain: "wiktionary.org", pattern: /\/wiki\/([^:]+)$/ },
+            { domain: "thesaurus.com", pattern: /\/browse\/([^\/\?#]+)/ }
+        ];
+
+        // Global variables
+        let allTabs = [];
+        let dictionaryTabs = [];
+
+        // DOM elements
+        const readTabsBtn = document.getElementById('readTabsBtn');
+        const saveJsonBtn = document.getElementById('saveJsonBtn');
+        const copyJsonBtn = document.getElementById('copyJsonBtn');
+        const statusDiv = document.getElementById('status');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const dictTabCount = document.getElementById('dictTabCount');
+        const totalTabCount = document.getElementById('totalTabCount');
+        const tabsTableBody = document.getElementById('tabsTableBody');
+        const jsonContent = document.getElementById('jsonContent');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const searchInput = document.getElementById('searchInput');
+
+        // Check if running in Firefox
+        function isFirefox() {
+            return navigator.userAgent.includes('Firefox');
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+            statusDiv.classList.remove('hidden');
+        }
+
+        // Extract search term from URL
+        function extractSearchTerm(url, domain) {
+            const matchingSite = dictionarySites.find(site => url.includes(site.domain));
+            if (!matchingSite) return null;
+            
+            try {
+                const urlObj = new URL(url);
+                const match = urlObj.pathname.match(matchingSite.pattern);
+                if (match && match[1]) {
+                    return decodeURIComponent(match[1].replace(/\+/g, ' '));
+                }
+                
+                // Check for query parameters
+                const searchParams = urlObj.searchParams;
+                for (const param of ['q', 'query', 'word', 'term', 'search']) {
+                    if (searchParams.has(param)) {
+                        return searchParams.get(param);
+                    }
+                }
+            } catch (e) {
+                console.error("Error parsing URL:", e);
+            }
+            
+            return null;
+        }
+
+        // Check if URL is from a dictionary site
+        function isDictionarySite(url) {
+            const urlObj = new URL(url);
+            let domain = urlObj.hostname.toLowerCase();
+            
+            // Remove 'www.' prefix if present
+            if (domain.startsWith('www.')) {
+                domain = domain.substring(4);
+            }
+            
+            return dictionarySites.some(site => domain.includes(site.domain));
+        }
+
+        // Get dictionary name from URL
+        function getDictionaryName(url) {
+            const urlObj = new URL(url);
+            let domain = urlObj.hostname.toLowerCase();
+            
+            // Remove 'www.' prefix if present
+            if (domain.startsWith('www.')) {
+                domain = domain.substring(4);
+            }
+            
+            // Extract the main dictionary name
+            for (const site of dictionarySites) {
+                if (domain.includes(site.domain)) {
+                    // Capitalize first letter and format nicely
+                    const name = site.domain.split('.')[0];
+                    return name.charAt(0).toUpperCase() + name.slice(1);
+                }
+            }
+            
+            return "Unknown";
+        }
+
+        // Read tabs from browser
+        async function readTabs() {
+            if (!isFirefox()) {
+                showStatus('This tool only works in Firefox. Please open it in Firefox browser.', 'error');
+                return;
+            }
+            
+            try {
+                showStatus('Reading tabs...', 'warning');
+                
+                // Check if browser.tabs API is available (Firefox only)
+                if (typeof browser !== 'undefined' && browser.tabs) {
+                    // Get all tabs from all windows
+                    const tabs = await browser.tabs.query({});
+                    processTabsData(tabs);
+                } else {
+                    // Fallback method for Firefox without extension permissions
+                    showStatus('This tool requires Firefox with the "tabs" permission. Please use the Python version instead.', 'error');
+                }
+            } catch (error) {
+                console.error('Error reading tabs:', error);
+                showStatus('Error reading tabs: ' + error.message, 'error');
+            }
+        }
+
+        // Process tabs data
+        function processTabsData(tabs) {
+            allTabs = tabs.map(tab => ({
+                title: tab.title,
+                url: tab.url,
+                favIconUrl: tab.favIconUrl,
+                windowId: tab.windowId,
+                index: tab.index,
+                active: tab.active
+            }));
+            
+            // Filter dictionary tabs
+            dictionaryTabs = allTabs.filter(tab => isDictionarySite(tab.url))
+                .map(tab => {
+                    const dictionaryName = getDictionaryName(tab.url);
+                    const searchTerm = extractSearchTerm(tab.url, dictionaryName);
+                    
+                    return {
+                        ...tab,
+                        dictionary: dictionaryName,
+                        search_term: searchTerm
+                    };
+                });
+            
+            // Update UI
+            dictTabCount.textContent = dictionaryTabs.length;
+            totalTabCount.textContent = allTabs.length;
+            
+            // Display results
+            displayResults();
+            
+            // Enable buttons
+            saveJsonBtn.disabled = false;
+            copyJsonBtn.disabled = false;
+            
+            showStatus(`Found ${dictionaryTabs.length} dictionary tabs out of ${allTabs.length} total tabs.`, 'success');
+            resultsContainer.classList.remove('hidden');
+            
+            // Generate JSON
+            generateJson();
+        }
+
+        // Display results in table
+        function displayResults() {
+            tabsTableBody.innerHTML = '';
+            
+            dictionaryTabs.forEach((tab, index) => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${escapeHtml(tab.title)}</td>
+                    <td><a href="${tab.url}" target="_blank">${escapeHtml(tab.url)}</a></td>
+                    <td>${escapeHtml(tab.dictionary)}</td>
+                    <td>${escapeHtml(tab.search_term || 'N/A')}</td>
+                `;
+                
+                tabsTableBody.appendChild(row);
+            });
+        }
+
+        // Generate JSON output
+        function generateJson() {
+            const jsonData = dictionaryTabs.map(tab => ({
+                title: tab.title,
+                url: tab.url,
+                dictionary: tab.dictionary,
+                search_term: tab.search_term
+            }));
+            
+            const jsonString = JSON.stringify(jsonData, null, 2);
+            jsonContent.textContent = jsonString;
+            jsonOutput.classList.remove('hidden');
+        }
+
+        // Save JSON to file
+        function saveJson() {
+            const jsonData = dictionaryTabs.map(tab => ({
+                title: tab.title,
+                url: tab.url,
+                dictionary: tab.dictionary,
+                search_term: tab.search_term
+            }));
+            
+            const jsonString = JSON.stringify(jsonData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'dictionary_tabs.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showStatus('JSON file saved successfully!', 'success');
+        }
+
+        // Copy JSON to clipboard
+        function copyJson() {
+            const jsonData = dictionaryTabs.map(tab => ({
+                title: tab.title,
+                url: tab.url,
+                dictionary: tab.dictionary,
+                search_term: tab.search_term
+            }));
+            
+            const jsonString = JSON.stringify(jsonData, null, 2);
+            
+            navigator.clipboard.writeText(jsonString)
+                .then(() => {
+                    showStatus('JSON copied to clipboard!', 'success');
+                })
+                .catch(err => {
+                    console.error('Error copying to clipboard:', err);
+                    showStatus('Error copying to clipboard: ' + err.message, 'error');
+                });
+        }
+
+        // Filter table based on search input
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const rows = tabsTableBody.getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 0; j < cells.length; j++) {
+                    const cellText = cells[j].textContent.toLowerCase();
+                    if (cellText.includes(searchTerm)) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                row.style.display = found ? '' : 'none';
+            }
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Event listeners
+        readTabsBtn.addEventListener('click', readTabs);
+        saveJsonBtn.addEventListener('click', saveJson);
+        copyJsonBtn.addEventListener('click', copyJson);
+        searchInput.addEventListener('input', filterTable);
+
+        // Check if Firefox on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!isFirefox()) {
+                showStatus('This tool only works in Firefox. Please open it in Firefox browser.', 'error');
+                readTabsBtn.disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>
