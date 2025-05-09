@@ -1,19 +1,30 @@
 // Dictionary site patterns (loaded from rules.json)
 let dictionarySites = [];
 
-// Load dictionary rules
+// Load dictionary rules via extension messaging
 async function loadDictionaryRules() {
-    try {
-        const response = await fetch(browser.runtime.getURL('rules.json'));
-        dictionarySites = await response.json();
-    } catch (error) {
-        console.error('Failed to load rules:', error);
-        // Fallback to default rules
-        dictionarySites = [
-            { domain: "dictionary.com", pattern: "/browse/([^/?#]+)" },
-            { domain: "merriam-webster.com", pattern: "/dictionary/([^/?#]+)" }
-        ];
-    }
+    return new Promise((resolve) => {
+        window.postMessage({ type: 'GET_RULES' }, '*');
+        
+        const handler = (event) => {
+            if (event.source !== window || event.data.type !== 'GET_RULES_RESPONSE') return;
+            
+            window.removeEventListener('message', handler);
+            
+            if (event.data.success) {
+                dictionarySites = event.data.rules;
+            } else {
+                console.error('Failed to load rules:', event.data.error);
+                dictionarySites = event.data.fallbackRules || [
+                    { domain: "dictionary.com", pattern: "/browse/([^/?#]+)" },
+                    { domain: "merriam-webster.com", pattern: "/dictionary/([^/?#]+)" }
+                ];
+            }
+            resolve();
+        };
+        
+        window.addEventListener('message', handler);
+    });
 }
 
 // Global variables
