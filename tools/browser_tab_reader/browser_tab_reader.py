@@ -30,36 +30,91 @@ def find_firefox_profiles():
     profiles = []
     for location in possible_locations:
         if location.exists():
-            for profile_dir in location.glob("*.default*"):
+            # Look for all profile directories, not just default ones
+            for profile_dir in location.glob("*"):
                 if profile_dir.is_dir():
-                    profiles.append(profile_dir)
+                    # Check if this looks like a Firefox profile (has places.sqlite or sessionstore files)
+                    has_places = (profile_dir / "places.sqlite").exists()
+                    has_session = any((profile_dir / "sessionstore.js").exists(),
+                                     (profile_dir / "sessionstore-backups").exists())
+                    
+                    if has_places or has_session:
+                        profiles.append(profile_dir)
     
     return profiles
 
 
 def get_firefox_tabs(profile_path):
     """
-    Get Firefox tabs from the recovery.jsonlz4 file.
+    Get Firefox tabs from session files.
     
-    Since we can't directly read the compressed lz4 file format in pure Python,
-    we'll use the sessionstore.js or sessionstore-backups/recovery.js file if available.
+    Tries multiple session file formats and locations.
     """
+    # List of possible session files to try
     session_files = [
+        # Regular session files
         Path(profile_path) / "sessionstore.js",
+        Path(profile_path) / "sessionstore.json",
+        
+        # Backup session files
         Path(profile_path) / "sessionstore-backups" / "recovery.js",
+        Path(profile_path) / "sessionstore-backups" / "recovery.json",
         Path(profile_path) / "sessionstore-backups" / "previous.js",
+        Path(profile_path) / "sessionstore-backups" / "previous.json",
+        Path(profile_path) / "sessionstore-backups" / "upgrade.js",
+        Path(profile_path) / "sessionstore-backups" / "upgrade.json",
+        
+        # Older Firefox versions
+        Path(profile_path) / "sessionstore.bak",
+        Path(profile_path) / "session.js",
     ]
     
+    # Try to read each session file
     for session_file in session_files:
         if session_file.exists():
+            print(f"Found session file: {session_file}")
             try:
                 with open(session_file, 'r', encoding='utf-8') as f:
                     session_data = json.load(f)
-                    return parse_firefox_session(session_data)
+                    tabs = parse_firefox_session(session_data)
+                    if tabs:
+                        return tabs
+                    print(f"No tabs found in {session_file}")
             except (json.JSONDecodeError, UnicodeDecodeError, IOError) as e:
                 print(f"Error reading {session_file}: {e}")
     
+    # Try to handle compressed lz4 files if available
+    try:
+        import lz4.block
+        
+        lz4_files = [
+            Path(profile_path) / "sessionstore.jsonlz4",
+            Path(profile_path) / "sessionstore-backups" / "recovery.jsonlz4",
+            Path(profile_path) / "sessionstore-backups" / "previous.jsonlz4",
+        ]
+        
+        for lz4_file in lz4_files:
+            if lz4_file.exists():
+                print(f"Found compressed session file: {lz4_file}")
+                try:
+                    with open(lz4_file, 'rb') as f:
+                        # Skip the first 8 bytes (Mozilla LZ4 header)
+                        f.seek(8)
+                        compressed_data = f.read()
+                        decompressed = lz4.block.decompress(compressed_data)
+                        session_data = json.loads(decompressed.decode('utf-8'))
+                        tabs = parse_firefox_session(session_data)
+                        if tabs:
+                            return tabs
+                        print(f"No tabs found in {lz4_file}")
+                except Exception as e:
+                    print(f"Error reading compressed file {lz4_file}: {e}")
+    except ImportError:
+        print("lz4 module not available. Cannot read compressed session files.")
+    
     print("Could not find or read any Firefox session files.")
+    print("Firefox may be currently running with all windows in private browsing mode,")
+    print("or the profile directory may not contain any saved sessions.")
     return []
 
 
@@ -232,8 +287,31 @@ def main():
         if not profiles:
             print("No Firefox profiles found. Please specify a profile path.")
             sys.exit(1)
-        profile_path = profiles[0]
-        print(f"Using Firefox profile: {profile_path}")
+        
+        if len(profiles) == 1:
+            profile_path = profiles[0]
+            print(f"Using Firefox profile: {profile_path}")
+        else:
+            print("Multiple Firefox profiles found:")
+            for i, profile in enumerate(profiles, 1):
+                print(f"{i}. {profile}")
+            
+            try:
+                choice = input("Enter profile number to use (or press Enter for first profile): ")
+                if choice.strip():
+                    profile_idx = int(choice) - 1
+                    if 0 <= profile_idx < len(profiles):
+                        profile_path = profiles[profile_idx]
+                    else:
+                        print(f"Invalid choice. Using first profile.")
+                        profile_path = profiles[0]
+                else:
+                    profile_path = profiles[0]
+            except ValueError:
+                print("Invalid input. Using first profile.")
+                profile_path = profiles[0]
+            
+            print(f"Using Firefox profile: {profile_path}")
     
     # Load dictionary sites
     dictionary_sites = []

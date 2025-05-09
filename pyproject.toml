@@ -15,7 +15,8 @@ packages = [
 python = ">=3.8.1,<4.0"
 
 # Browser Tab Reader dependencies
-# No external dependencies required for basic functionality
+# Optional dependencies for enhanced functionality
+lz4 = {version = "^4.3.2", optional = true}
 
 # Anki Import Tool dependencies (optional)
 genanki = {version = "^0.13.0", optional = true}
@@ -30,11 +31,11 @@ pandas = {version = "^2.0.0", optional = true}
 openpyxl = {version = "^3.1.2", optional = true}
 
 [tool.poetry.extras]
-browser_tab_reader = []
+browser_tab_reader = ["lz4"]
 anki_import = ["genanki"]
 ocr_dictionary = ["pytesseract", "opencv-python", "pillow"]
 csv_excel_converter = ["pandas", "openpyxl"]
-all = ["genanki", "pytesseract", "opencv-python", "pillow", "pandas", "openpyxl"]
+all = ["lz4", "genanki", "pytesseract", "opencv-python", "pillow", "pandas", "openpyxl"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"

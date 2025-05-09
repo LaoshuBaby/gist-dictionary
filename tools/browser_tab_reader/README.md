@@ -37,9 +37,24 @@ A tool to extract and process vocabulary from your browser tabs. This tool reads
 ### Manual Installation (Recommended)
 ### 手动安装（推荐）
 
-No special installation is required. Just make sure you have Python 3.6+ installed. The browser tab reader has no external dependencies.
+No special installation is required. Just make sure you have Python 3.6+ installed. The browser tab reader has no required external dependencies.
 
-不需要特殊安装。只需确保已安装Python 3.6+。浏览器标签页阅读器没有外部依赖项。
+不需要特殊安装。只需确保已安装Python 3.6+。浏览器标签页阅读器没有必需的外部依赖项。
+
+#### Optional Dependencies
+#### 可选依赖项
+
+For better Firefox session handling, you can install the lz4 module:
+
+为了更好地处理Firefox会话，你可以安装lz4模块：
+
+```bash
+pip install lz4
+```
+
+This allows reading compressed Firefox session files (*.jsonlz4) directly.
+
+这允许直接读取压缩的Firefox会话文件（*.jsonlz4）。
 
 ### Using pip (Optional)
 ### 使用pip（可选）
