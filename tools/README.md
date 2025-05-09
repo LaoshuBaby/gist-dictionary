@@ -18,18 +18,37 @@ Each tool is contained in its own directory with a dedicated README.md file that
 
 ## Installation
 
-The tools can be installed using Poetry. See the main project's pyproject.toml for installation instructions.
+Most tools can be used directly without installation, as they are designed to be standalone Python scripts. However, for convenience, you can install them using pip or Poetry.
 
-### Basic Installation
+### Direct Usage (Recommended)
+
+Simply clone the repository and run the Python scripts directly:
+
+```bash
+git clone https://github.com/LaoshuBaby/gist-dictionary.git
+cd gist-dictionary
+python -m tools.browser_tab_reader.browser_tab_reader
+```
+
+### Using pip
+
+```bash
+# Install a specific tool
+pip install -e ".[browser_tab_reader]"
+pip install -e ".[ocr_dictionary]"
+
+# Install all tools
+pip install -e ".[all]"
+```
+
+### Using Poetry (Optional)
+
+If you prefer using Poetry for dependency management:
 
 ```bash
 # Install the base package
 poetry install
-```
 
-### Install with Tool Dependencies
-
-```bash
 # Install with specific tool dependencies
 poetry install --extras "browser_tab_reader"
 poetry install --extras "ocr_dictionary"

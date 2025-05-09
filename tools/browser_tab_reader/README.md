@@ -34,8 +34,30 @@ A tool to extract and process vocabulary from your browser tabs. This tool reads
 ## Installation
 ## 安装
 
-### Using Poetry
-### 使用Poetry
+### Manual Installation (Recommended)
+### 手动安装（推荐）
+
+No special installation is required. Just make sure you have Python 3.6+ installed. The browser tab reader has no external dependencies.
+
+不需要特殊安装。只需确保已安装Python 3.6+。浏览器标签页阅读器没有外部依赖项。
+
+### Using pip (Optional)
+### 使用pip（可选）
+
+If you want to install the tool as a package:
+
+如果你想将该工具作为包安装：
+
+```bash
+pip install -e ".[browser_tab_reader]"
+```
+
+### Using Poetry (Optional)
+### 使用Poetry（可选）
+
+Poetry is a dependency management tool. If you prefer to use it:
+
+Poetry是一个依赖管理工具。如果你喜欢使用它：
 
 ```bash
 # Install with Poetry
@@ -44,20 +66,6 @@ poetry install --extras "browser_tab_reader"
 # Or install all tools
 poetry install --extras "all"
 ```
-
-### Using pip
-### 使用pip
-
-```bash
-pip install -e ".[browser_tab_reader]"
-```
-
-### Manual Installation
-### 手动安装
-
-No special installation is required. Just make sure you have Python 3.6+ installed.
-
-不需要特殊安装。只需确保已安装Python 3.6+。
 
 ## How to Run
 ## 如何运行
