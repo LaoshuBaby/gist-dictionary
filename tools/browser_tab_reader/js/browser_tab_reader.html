@@ -4,8 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="app_title">Firefox Tab Reader</title>
-    <!-- Include JSZip library for creating ZIP files -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- JSZip loading with fallback -->
+    <script>
+    (function() {
+        function loadJSZip() {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                script.integrity = 'sha512-XMVd28F1oH/O71fzw+nVY1Q4SaYcr3Qa6WUItvL4g07WH5I0mo6YFY0Q9XaZ2O0RlQppXZxyW3z3a2X2v5YHQ==';
+                script.crossOrigin = 'anonymous';
+                script.onload = () => {
+                    if (window.JSZip) {
+                        resolve();
+                    } else {
+                        loadLocalFallback();
+                    }
+                };
+                script.onerror = loadLocalFallback;
+                document.head.appendChild(script);
+
+                function loadLocalFallback() {
+                    const fallbackScript = document.createElement('script');
+                    fallbackScript.src = 'js/jszip.min.js';
+                    fallbackScript.onload = resolve;
+                    fallbackScript.onerror = () => {
+                        console.error('JSZip failed to load');
+                        document.getElementById('status').textContent = 'Error: Required libraries failed to load';
+                        reject();
+                    };
+                    document.head.appendChild(fallbackScript);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadJSZip().catch(() => {
+                // Handle complete loading failure
+                document.querySelectorAll('button').forEach(btn => btn.disabled = true);
+            });
+        });
+    })();
+    </script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>

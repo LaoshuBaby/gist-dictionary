@@ -1,0 +1,12 @@
+{
+  "manifest_version": 2,
+  "name": "Tab Reader",
+  "version": "1.0",
+  "description": "Reads browser tabs",
+  "permissions": ["tabs"],
+  "web_accessible_resources": ["rules.json"],
+  "content_scripts": [{
+    "matches": ["*://localhost/*"],
+    "js": ["js/content.js"]
+  }]
+}

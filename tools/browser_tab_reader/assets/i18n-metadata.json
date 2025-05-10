@@ -1,0 +1,114 @@
+{
+  "locales": ["en", "zh"],
+  "defaultLocale": "en", 
+  "strings": {
+    "app_title": {
+      "en": "Firefox Tab Reader",
+      "zh": "浏览器标签页阅读器"
+    },
+    "app_subtitle": {
+      "en": "Browser Tab Dictionary Tool",
+      "zh": "浏览器标签页词典工具"  
+    },
+    "instructions_title": {
+      "en": "Instructions",
+      "zh": "使用说明"
+    },
+    "instructions_content": {
+      "en": "This tool extracts all your open Firefox tabs and identifies dictionary websites...",
+      "zh": "该工具提取您所有打开的Firefox标签页并识别词典网站..."
+    },
+    "read_tabs_btn": {
+      "en": "Read Tabs",
+      "zh": "读取标签页"
+    },
+    "save_json_btn": {
+      "en": "Save as JSON", 
+      "zh": "保存为JSON"
+    },
+    "copy_json_btn": {
+      "en": "Copy JSON",
+      "zh": "复制JSON"
+    },
+    "dictionary_tabs_title": {
+      "en": "Dictionary Tabs",
+      "zh": "词典标签页"
+    },
+    "found_tabs": {
+      "en": "Found",
+      "zh": "找到"
+    },
+    "dictionary_tabs": {
+      "en": "dictionary tabs",
+      "zh": "个词典标签页"
+    },
+    "out_of": {
+      "en": "out of",
+      "zh": "，共"
+    },
+    "total_tabs": {
+      "en": "total tabs",
+      "zh": "个标签页"
+    },
+    "search_placeholder": {
+      "en": "Search tabs...",
+      "zh": "搜索标签页..."
+    },
+    "title_header": {
+      "en": "Title",
+      "zh": "标题"
+    },
+    "url_header": {
+      "en": "URL",
+      "zh": "网址"
+    },
+    "dictionary_header": {
+      "en": "Dictionary",
+      "zh": "词典网站"
+    },
+    "search_term_header": {
+      "en": "Search Term",
+      "zh": "搜索词"
+    },
+    "json_output_title": {
+      "en": "JSON Output",
+      "zh": "JSON输出"
+    },
+    "english_instructions": {
+      "en": "English Instructions:",
+      "zh": "英文说明："
+    },
+    "create_extension_btn": {
+      "en": "Create Extension Files",
+      "zh": "创建扩展文件"
+    },
+    "extension_instructions": {
+      "en": "You can either use the button above to automatically create the extension files, or follow these manual steps:",
+      "zh": "您可以使用上面的按钮自动创建扩展文件，或按照以下手动步骤操作："
+    },
+    "chinese_instructions": {
+      "en": "Chinese Instructions:",
+      "zh": "中文说明："
+    },
+    "create_extension_btn_zh": {
+      "en": "创建扩展文件",
+      "zh": "创建扩展文件"
+    },
+    "extension_instructions_zh": {
+      "en": "您可以使用上面的按钮自动创建扩展文件，或按照以下手动步骤操作：",
+      "zh": "您可以使用上面的按钮自动创建扩展文件，或按照以下手动步骤操作："
+    },
+    "note": {
+      "en": "Note:",
+      "zh": "注意："
+    },
+    "firefox_note": {
+      "en": "This tool only works when opened in Firefox...",
+      "zh": "该工具仅在Firefox中打开时有效..."
+    },
+    "temp_extension_note": {
+      "en": "This temporary extension will be removed when you close Firefox.",
+      "zh": "当您关闭Firefox时，此临时扩展将被移除。"
+    }
+  }
+}
