@@ -1,0 +1,22 @@
+[
+    {
+        "domain": "dictionary.com",
+        "pattern": "/browse/([^/?#]+)"
+    },
+    {
+        "domain": "merriam-webster.com", 
+        "pattern": "/dictionary/([^/?#]+)"
+    },
+    {
+        "domain": "vocabulary.com",
+        "pattern": "/dictionary/([^/?#]+)"
+    },
+    {
+        "domain": "thefreedictionary.com",
+        "pattern": "/([^/?#]+)$"
+    },
+    {
+        "domain": "dictionary.cambridge.org",
+        "pattern": "/dictionary/[^/]+/([^/?#]+)"
+    }
+]

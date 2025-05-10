@@ -1,0 +1,56 @@
+[tool.poetry]
+name = "gist-dictionary"
+version = "0.1.0"
+description = "A dictionary tool for collecting and organizing vocabulary"
+authors = ["LaoshuBaby <laoshubaby@example.com>"]
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/LaoshuBaby/gist-dictionary"
+packages = [
+    {include = "gist_dictionary"},
+    {include = "tools"}
+]
+
+[tool.poetry.dependencies]
+python = ">=3.8.1,<4.0"
+
+# Browser Tab Reader dependencies
+# Optional dependencies for enhanced functionality
+lz4 = {version = "^4.3.2", optional = true}
+
+# Anki Import Tool dependencies (optional)
+genanki = {version = "^0.13.0", optional = true}
+
+# OCR Dictionary Tool dependencies (optional)
+pytesseract = {version = "^0.3.10", optional = true}
+opencv-python = {version = "^4.8.0", optional = true}
+pillow = {version = "^10.0.0", optional = true}
+
+# CSV/Excel Converter dependencies (optional)
+pandas = {version = "^2.0.0", optional = true}
+openpyxl = {version = "^3.1.2", optional = true}
+
+[tool.poetry.extras]
+browser_tab_reader = ["lz4"]
+anki_import = ["genanki"]
+ocr_dictionary = ["pytesseract", "opencv-python", "pillow"]
+csv_excel_converter = ["pandas", "openpyxl"]
+all = ["lz4", "genanki", "pytesseract", "opencv-python", "pillow", "pandas", "openpyxl"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+black = "^23.3.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+mypy = "^1.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# These scripts are optional and only available if you install with Poetry
+# You can always run the tools directly with Python
+[tool.poetry.scripts]
+browser-tab-reader = "tools.browser_tab_reader.browser_tab_reader:main"
+ocr-dictionary = "tools.ocr_dictionary.ocr_dictionary:main"
+# Add more scripts as tools are implemented
