@@ -27,7 +27,6 @@ async function loadTabs() {
     
     const tabs = await tabsApi.query({});
     const windows = await windowsApi.getAll({ populate: true });
-    const windows = await browser.windows.getAll({ populate: true });
     
     tabData = tabs.map(tab => ({
       id: tab.id,
@@ -103,5 +102,13 @@ function exportJSON() {
 
 loadTabs();
 setInterval(loadTabs, 5000);
-window.loadTabs = loadTabs;
-window.exportJSON = exportJSON;
+// DOM 加载完成后绑定事件 (CSP 兼容)
+document.addEventListener('DOMContentLoaded', function() {
+  const refreshBtn = document.getElementById('refresh-btn');
+  const exportBtn = document.getElementById('export-btn');
+  
+  if (refreshBtn) refreshBtn.addEventListener('click', loadTabs);
+  if (exportBtn) exportBtn.addEventListener('click', exportJSON);
+  
+  console.log('✅ 按钮事件绑定完成');
+});
