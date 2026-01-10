@@ -1,12 +1,32 @@
-// Firefox Tab Counter Popup v1.4 - 语法修复 + JSON 导出 + 窗口信息
-let tabData = []; 
-let lastUpdate = 0;
+// Firefox Tab Counter Popup v1.5 - 扩展环境检测 + 错误处理 + JSON 导出
+if (typeof browser === 'undefined' && typeof chrome === 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.innerHTML = `
+      <div style="padding:20px;text-align:center;color:#ff4444;background:#ffe6e6;border-radius:12px;margin:20px;font-family:sans-serif">
+        <h2>❌ 需要浏览器扩展环境</h2>
+        <p>请按以下步骤安装:</p>
+        <ol style="text-align:left;max-width:350px;margin:0 auto">
+          <li><strong>Firefox:</strong> about:debugging → Load Temporary Add-on → manifest.json</li>
+          <li><strong>Chrome:</strong> chrome://extensions/ → Load unpacked → 整个文件夹</li>
+          <li>点击工具栏图标</li>
+        </ol>
+      </div>
+    `;
+  });
+} else {
+  let tabData = []; 
+  let lastUpdate = 0;
 
 async function loadTabs() {
   try {
     console.log('🔄 加载标签页数据...');
     
-    const tabs = await browser.tabs.query({});
+    // Chrome/Firefox 兼容
+    const tabsApi = (typeof browser !== 'undefined') ? browser.tabs : chrome.tabs;
+    const windowsApi = (typeof browser !== 'undefined') ? browser.windows : chrome.windows;
+    
+    const tabs = await tabsApi.query({});
+    const windows = await windowsApi.getAll({ populate: true });
     const windows = await browser.windows.getAll({ populate: true });
     
     tabData = tabs.map(tab => ({
@@ -33,6 +53,15 @@ async function loadTabs() {
 
     if (tabs.length === 0) {
       tbody.innerHTML = '<tr><td colspan="6" class="empty">暂无标签页</td></tr>';
+      return;
+    }
+
+    // DOM 检查
+    const totalEl = document.getElementById('total-count');
+    const windowEl = document.getElementById('window-count');
+    const updateEl = document.getElementById('last-update');
+    if (!totalEl || !windowEl || !updateEl) {
+      console.error('❌ DOM 元素缺失');
       return;
     }
 
